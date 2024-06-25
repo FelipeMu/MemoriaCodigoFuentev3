@@ -958,7 +958,7 @@ end
 
 
 % Especifica el directorio donde deseas guardar la estructura
-directory_structs = 'D:\TT\Memoria\Memoria_Codigo_Fuente\codigo_matlab\codigo_fuente\Estructuras_SANOS_TEC';
+directory_structs = 'D:\TT\Memoria\MemoriaCodigoFuentev3\codigo_matlab\codigo_fuente\Estructuras_SANOS_TEC';
 
 %============== Sanos ==================================================
 % Especifica el nombre del archivo
@@ -968,7 +968,7 @@ filepath_struct_sano = fullfile(directory_structs, filename_struct_sano);
 % Guarda la estructura en el archivo .mat
 save(filepath_struct_sano, 'struct_dls_sano', '-v7.3');
 % Mensaje de confirmación
-disp(['(*) La estructura para sujetos sanos se ha guardado en: ', filepath_struct_sano]);
+fprintf("(*) La estructura para sujetos sanos se ha guardado correctamente\n");
 
 %============== TEC ==================================================
 % Especifica el nombre del archivo
@@ -978,6 +978,119 @@ filepath_struct_tec = fullfile(directory_structs, filename_struct_tec);
 % Guarda la estructura en el archivo .mat
 save(filepath_struct_tec, 'struct_dls_tec', '-v7.3');
 % Mensaje de confirmación
-disp(['La estructura para pacientes TEC se ha guardado en: ', filepath_struct_tec]);
+fprintf("(*) La estructura para pacientes TEC se ha guardado correctamente\n");
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%% GUARDAR MATRICES COMPLEJAS (COEFICIENTES) EN FORMATO ".mat" -> ENTRENAR RED U-NET %%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+% Almacenar matrices complejas pam y vsc en carpetas especificas para 
+% luego trabajar con la red profunda en python. Para ello se importan 
+% las matrices en formato.mat y luego en python se utiliza un script
+% para transformar dicho formato a npy.
+direct_sanos = 'D:/TT/Memoria/MemoriaCodigoFuentev3/codigo_matlab/codigo_fuente/Signals_LDS/SANOS';
+direct_tecs = 'D:/TT/Memoria/MemoriaCodigoFuentev3/codigo_matlab/codigo_fuente/Signals_LDS/TEC';
+
+% Obtener los nombres de las carpetas dentro del directorio de SANOS
+folders_sanos = dir(direct_sanos);
+foldernames_sanos = {folders_sanos([folders_sanos.isdir]).name}; % se obtiene los nombres de las carpetas
+% Eliminar los nombres '.' y '..' que representan el directorio actual y el directorio padre
+foldernames_sanos = setdiff(foldernames_sanos, {'.', '..'}); % vector fila que almcena los nombres de todas las carpetas de sujetos sanos
+
+
+% Obtener los nombres de las carpetas dentro del directorio de TEC
+folders_tecs = dir(direct_tecs);
+foldernames_tecs = {folders_tecs([folders_tecs.isdir]).name}; % se obtiene los nombres de las carpetas
+% Eliminar los nombres '.' y '..' que representan el directorio actual y el directorio padre
+foldernames_tecs = setdiff(foldernames_tecs, {'.', '..'}); % vector fila que almcena los nombres de todas las carpetas de pacientes tec
+
+
+%################################################
+% Guardar las matrices complejas en archivos .mat
+%################################################
+num_people = 27;
+num_matrix_complexs = 50;
+for i = 1:num_people
+    % Se deben crear 3 carpetas para cada sujeto sano y paciente TEC. una
+    % carpeta de matriz_compleja_pam, matriz_compleja_vscd y
+    % matriz_compleja_vsci
+    direct_folder_sano_i = fullfile(direct_sanos, foldernames_sanos{i}); % carpeta del sujeto sano posicion i
+    direct_folder_tec_i = fullfile(direct_tecs, foldernames_tecs{i}); % carpeta del paciente tec posicion i
+
+    % Creando las respectivas 3 carpetas, sino existen se crean.
+    % Directorios para guardar los archivos.mat asociados a los inputs de coeficientes
+
+    % Nombres d que tendran las respectivas carpetas:
+    name_folder_pam = '/PAMnoises_matrixcomplex_mat';
+    name_folder_vscd = '/VSCdnoises_matrixcomplex_mat';
+    name_folder_vsci = '/VSCinoises_matrixcomplex_mat';
+    % Directorio donde se crearan dichas carpetas (3 total:
+    % name_folder_pam, name_folder_vscd y name_folder_vsci) - SANO ***
+    direct_final_cfs_pam_sano = fullfile(direct_folder_sano_i, name_folder_pam);
+    direct_final_cfs_vscd_sano = fullfile(direct_folder_sano_i, name_folder_vscd);
+    direct_final_cfs_vsci_sano = fullfile(direct_folder_sano_i, name_folder_vsci);
+    % Directorio donde se crearan dichas carpetas (3 total:
+    % name_folder_pam, name_folder_vscd y name_folder_vsci) - TEC ***
+    direct_final_cfs_pam_tec = fullfile(direct_folder_tec_i, name_folder_pam);
+    direct_final_cfs_vscd_tec = fullfile(direct_folder_tec_i, name_folder_vscd);
+    direct_final_cfs_vsci_tec = fullfile(direct_folder_tec_i, name_folder_vsci);
+
+    % Creando carpetas si no existen...
+    %%%% SANO %%%%
+    if ~exist(direct_final_cfs_pam_sano, 'dir')
+        mkdir(direct_final_cfs_pam_sano);
+    end
+    if ~exist(direct_final_cfs_vscd_sano, 'dir')
+        mkdir(direct_final_cfs_vscd_sano);
+    end
+    if ~exist(direct_final_cfs_vsci_sano, 'dir')
+        mkdir(direct_final_cfs_vsci_sano);
+    end
+    %%%% TEC %%%%
+    if ~exist(direct_final_cfs_pam_tec, 'dir')
+        mkdir(direct_final_cfs_pam_tec);
+    end
+    if ~exist(direct_final_cfs_vscd_tec, 'dir')
+        mkdir(direct_final_cfs_vscd_tec);
+    end
+    if ~exist(direct_final_cfs_vsci_tec, 'dir')
+        mkdir(direct_final_cfs_vsci_tec);
+    end
+
+    % Se obtiene el sujeto sano i y el paciente tec i de sus respectivas
+    % estructuras.
+    person_sano = struct_dls_sano(i);
+    person_tec = struct_dls_tec(i);
+    fprintf("[%i] Rellenando carpetas: SANO: %s || TEC: %s ...\n", i, foldernames_sanos{i}, foldernames_tecs{i});
+    fprintf("[%i] Guardando matrices complejas (PAM, VSCd y VSCi) de: SANO %s || TEC: %s\n",i, person_sano.name_file, person_tec.name_file);
+    for j = 1:num_matrix_complexs
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SANO %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+        % Guardar matriz_complex_pam
+        matrix_complex_pam_sano = person_sano.struct_VSCd_noises(j).matrix_complex_pam;
+        save(fullfile(direct_final_cfs_pam_sano, sprintf('matrix_complex_pam_noise_%d.mat', j)), 'matrix_complex_pam_sano');
+        % Guardar matriz_complex_vscd
+        matrix_complex_vscd_sano = person_sano.struct_VSCd_noises(j).matrix_complex_vscd;
+        save(fullfile(direct_final_cfs_vscd_sano, sprintf('matrix_complex_vscd_noise_%d.mat', j)), 'matrix_complex_vscd_sano');
+        % Guardar matriz_complex_vsci
+        matrix_complex_vsci_sano = person_sano.struct_VSCi_noises(j).matrix_complex_vsci;
+        save(fullfile(direct_final_cfs_vsci_sano, sprintf('matrix_complex_vsci_noise_%d.mat', j)), 'matrix_complex_vsci_sano');
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% TEC %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+        % Guardar matriz_complex_pam
+        matrix_complex_pam_tec = person_tec.struct_VSCd_noises(j).matrix_complex_pam;
+        save(fullfile(direct_final_cfs_pam_tec, sprintf('matrix_complex_pam_noise_%d.mat', j)), 'matrix_complex_pam_tec');
+        % Guardar matriz_complex_vscd
+        matrix_complex_vscd_tec = person_sano.struct_VSCd_noises(j).matrix_complex_vscd;
+        save(fullfile(direct_final_cfs_vscd_tec, sprintf('matrix_complex_vscd_noise_%d.mat', j)), 'matrix_complex_vscd_tec');
+        % Guardar matriz_complex_vsci
+        matrix_complex_vsci_tec = person_sano.struct_VSCi_noises(j).matrix_complex_vsci;
+        save(fullfile(direct_final_cfs_vsci_tec, sprintf('matrix_complex_vsc_noise_%d.mat', j)), 'matrix_complex_vsci_tec');
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    end
+end
 

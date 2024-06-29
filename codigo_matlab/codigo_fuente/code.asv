@@ -1036,7 +1036,7 @@ fprintf("(*) La estructura para sujetos sanos se ha guardado correctamente\n");
 
 %============== TEC ==================================================
 % Especifica el nombre del archivo
-filename_struct_tec = 'struct_dls_tec.mat';
+filename_struct_tec = 'struct_lds_tec.mat';
 % Crea la ruta completa del archivo
 filepath_struct_tec = fullfile(directory_structs, filename_struct_tec);
 % Guarda la estructura en el archivo .mat
@@ -1092,16 +1092,33 @@ for i = 1:num_people
     name_folder_pam = '/PAMnoises_matrixcomplex_mat';
     name_folder_vscd = '/VSCdnoises_matrixcomplex_mat';
     name_folder_vsci = '/VSCinoises_matrixcomplex_mat';
+    % Para las matrices complejas de senales originales:
+    name_folder_original_pam = '/PAMoriginal_matrixcomplex';
+    name_folder_original_vscd = '/VSCdoriginal_matrixcomplex';
+    name_folder_original_vsci = '/VSCioriginal_matrixcomplex';
+    
     % Directorio donde se crearan dichas carpetas (3 total:
     % name_folder_pam, name_folder_vscd y name_folder_vsci) - SANO ***
     direct_final_cfs_pam_sano = fullfile(direct_folder_sano_i, name_folder_pam);
     direct_final_cfs_vscd_sano = fullfile(direct_folder_sano_i, name_folder_vscd);
     direct_final_cfs_vsci_sano = fullfile(direct_folder_sano_i, name_folder_vsci);
+    % Directorios para senales originales
+    direct_final_cfs_original_pam_sano = fullfile(direct_folder_sano_i, name_folder_original_pam);
+    direct_final_cfs_original_vscd_sano = fullfile(direct_folder_sano_i, name_folder_original_vscd);
+    direct_final_cfs_original_vsci_sano = fullfile(direct_folder_sano_i, name_folder_original_vsci);
+    
+    
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
     % Directorio donde se crearan dichas carpetas (3 total:
     % name_folder_pam, name_folder_vscd y name_folder_vsci) - TEC ***
     direct_final_cfs_pam_tec = fullfile(direct_folder_tec_i, name_folder_pam);
     direct_final_cfs_vscd_tec = fullfile(direct_folder_tec_i, name_folder_vscd);
     direct_final_cfs_vsci_tec = fullfile(direct_folder_tec_i, name_folder_vsci);
+    % Directorios para senales originales
+    direct_final_cfs_original_pam_tec = fullfile(direct_folder_tec_i, name_folder_original_pam);
+    direct_final_cfs_original_vscd_tec = fullfile(direct_folder_tec_i, name_folder_original_vscd);
+    direct_final_cfs_original_vsci_tec = fullfile(direct_folder_tec_i, name_folder_original_vsci);
 
     % Creando carpetas si no existen...
     %%%% SANO %%%%
@@ -1114,6 +1131,19 @@ for i = 1:num_people
     if ~exist(direct_final_cfs_vsci_sano, 'dir')
         mkdir(direct_final_cfs_vsci_sano);
     end
+    % senales originales
+    if ~exist(direct_final_cfs_original_pam_sano, 'dir')
+        mkdir(direct_final_cfs_original_pam_sano);
+    end
+    if ~exist(direct_final_cfs_original_vscd_sano, 'dir')
+        mkdir(direct_final_cfs_original_vscd_sano);
+    end
+    if ~exist(direct_final_cfs_original_vsci_sano, 'dir')
+        mkdir(direct_final_cfs_original_vsci_sano);
+    end
+
+
+
     %%%% TEC %%%%
     if ~exist(direct_final_cfs_pam_tec, 'dir')
         mkdir(direct_final_cfs_pam_tec);
@@ -1123,6 +1153,16 @@ for i = 1:num_people
     end
     if ~exist(direct_final_cfs_vsci_tec, 'dir')
         mkdir(direct_final_cfs_vsci_tec);
+    end
+    % senales originales
+    if ~exist(direct_final_cfs_original_pam_tec, 'dir')
+        mkdir(direct_final_cfs_original_pam_tec);
+    end
+    if ~exist(direct_final_cfs_original_vscd_tec, 'dir')
+        mkdir(direct_final_cfs_original_vscd_tec);
+    end
+    if ~exist(direct_final_cfs_original_vsci_tec, 'dir')
+        mkdir(direct_final_cfs_original_vsci_tec);
     end
 
     % Se obtiene el sujeto sano i y el paciente tec i de sus respectivas
@@ -1134,26 +1174,44 @@ for i = 1:num_people
     for j = 1:num_matrix_complexs
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SANO %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
         % Guardar matriz_complex_pam
-        matrix_complex_pam_sano = person_sano.struct_VSCd_noises(j).matrix_complex_pam;
+        matrix_complex_pam_sano = person_sano.struct_VSCd_noises(j).matrix_complex_pam; % la PAM es la misma ya sea en VSCd o VSCi
         save(fullfile(direct_final_cfs_pam_sano, sprintf('matrix_complex_pam_noise_%d.mat', j)), 'matrix_complex_pam_sano');
+        % Guardar matriz_complex_original_pam
+        matrix_complex_original_pam_sano = person_sano.struct_original_PAM(1).matrix_complex_original_pam; % la PAM es la misma ya sea en VSCd o VSCi
+        save(fullfile(direct_final_cfs_original_pam_sano, 'matrix_complex_original_pam.mat'), 'matrix_complex_original_pam_sano');
         % Guardar matriz_complex_vscd
         matrix_complex_vscd_sano = person_sano.struct_VSCd_noises(j).matrix_complex_vscd;
         save(fullfile(direct_final_cfs_vscd_sano, sprintf('matrix_complex_vscd_noise_%d.mat', j)), 'matrix_complex_vscd_sano');
+        % Guardar matriz_complex_original_vscd
+        matrix_complex_original_vscd_sano = person_sano.struct_original_VSCd(1).matrix_complex_original_vscd;
+        save(fullfile(direct_final_cfs_original_vscd_sano, 'matrix_complex_original_vscd.mat'), 'matrix_complex_original_vscd_sano');
         % Guardar matriz_complex_vsci
         matrix_complex_vsci_sano = person_sano.struct_VSCi_noises(j).matrix_complex_vsci;
         save(fullfile(direct_final_cfs_vsci_sano, sprintf('matrix_complex_vsci_noise_%d.mat', j)), 'matrix_complex_vsci_sano');
+        % Guardar matriz_complex_original_vsci
+        matrix_complex_original_vsci_sano = person_sano.struct_original_VSCi(1).matrix_complex_original_vsci;
+        save(fullfile(direct_final_cfs_original_vsci_sano, 'matrix_complex_original_vsci.mat'), 'matrix_complex_original_vsci_sano');
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% TEC %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
         % Guardar matriz_complex_pam
         matrix_complex_pam_tec = person_tec.struct_VSCd_noises(j).matrix_complex_pam;
         save(fullfile(direct_final_cfs_pam_tec, sprintf('matrix_complex_pam_noise_%d.mat', j)), 'matrix_complex_pam_tec');
+        % Guardar matriz_complex_original_pam
+        matrix_complex_original_pam_tec = person_tec.struct_original_PAM(1).matrix_complex_original_pam; % la PAM es la misma ya sea en VSCd o VSCi
+        save(fullfile(direct_final_cfs_original_pam_tec, 'matrix_complex_original_pam.mat'), 'matrix_complex_original_pam_tec');
         % Guardar matriz_complex_vscd
-        matrix_complex_vscd_tec = person_sano.struct_VSCd_noises(j).matrix_complex_vscd;
+        matrix_complex_vscd_tec = person_tec.struct_VSCd_noises(j).matrix_complex_vscd;
         save(fullfile(direct_final_cfs_vscd_tec, sprintf('matrix_complex_vscd_noise_%d.mat', j)), 'matrix_complex_vscd_tec');
+        % Guardar matriz_complex_original_vscd
+        matrix_complex_original_vscd_tec = person_tec.struct_original_VSCd(1).matrix_complex_original_vscd;
+        save(fullfile(direct_final_cfs_original_vscd_tec, 'matrix_complex_original_vscd.mat'), 'matrix_complex_original_vscd_tec');
         % Guardar matriz_complex_vsci
-        matrix_complex_vsci_tec = person_sano.struct_VSCi_noises(j).matrix_complex_vsci;
+        matrix_complex_vsci_tec = person_tec.struct_VSCi_noises(j).matrix_complex_vsci;
         save(fullfile(direct_final_cfs_vsci_tec, sprintf('matrix_complex_vsc_noise_%d.mat', j)), 'matrix_complex_vsci_tec');
+        % Guardar matriz_complex_original_vsci
+        matrix_complex_original_vsci_tec = person_tec.struct_original_VSCi(1).matrix_complex_original_vsci;
+        save(fullfile(direct_final_cfs_original_vsci_tec, 'matrix_complex_original_vsci.mat'), 'matrix_complex_original_vsci_tec');
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     end
 end

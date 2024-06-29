@@ -520,9 +520,13 @@ fileList_sano = dir(fullfile(sourceDirectory_sano, '*.PAR'));
 num_healthy_people = numel(fileList_sano);
 
 % Inicializar las estructuras
+structure_original_PAM(1) = struct('matrix_complex_original_pam', [], 'scalscfs_original_pam', [], 'psif_original_pam', [], 'freqs_original_pam', []);
+structure_original_VSCd(1) = struct('matrix_complex_original_vscd', [], 'scalscfs_original_vscd', [], 'psif_original_vscd', [], 'freqs_original_vscd', []);
+structure_original_VSCi(1) = struct('matrix_complex_original_vsci', [], 'scalscfs_original_vsci', [], 'psif_original_vsci', [], 'freqs_original_vsci', []);
+
 structure_vscd_noises_sano(num_of_noises_signals) = struct('name_file_noise', '', 'pam_noise', [], 'matrix_complex_pam', [], 'scalscfs_pam_noise', [], 'psif_pam_noise', [], 'freqs_pam_noise', [], 'vscd_noise', [], 'matrix_complex_vscd', [], 'scalscfs_vscd_noise', [], 'psif_vscd_noise', [], 'freqs_vscd_noise', []);
 structure_vsci_noises_sano(num_of_noises_signals) = struct('name_file_noise', '', 'pam_noise', [], 'matrix_complex_pam', [], 'scalscfs_pam_noise', [], 'psif_pam_noise', [], 'freqs_pam_noise', [], 'vsci_noise', [], 'matrix_complex_vsci', [], 'scalscfs_vsci_noise', [], 'psif_vsci_noise', [], 'freqs_vsci_noise', []);
-struct_dls_sano(num_healthy_people) = struct('name_file', '', 'signal_pam', [], 'signal_vscd', [], 'signal_vsci', [], 'struct_VSCd_noises', structure_vscd_noises_sano, 'struct_VSCi_noises', structure_vsci_noises_sano);
+struct_lds_sano(num_healthy_people) = struct('name_file', '', 'signal_pam', [], 'signal_vscd', [], 'signal_vsci', [], 'struct_VSCd_noises', structure_vscd_noises_sano, 'struct_VSCi_noises', structure_vsci_noises_sano, 'struct_original_PAM', [], 'struct_original_VSCd', [], 'struct_original_VSCi', []);
 
 temp = 0; % activador para considerar que la senal PAM es la columna 2 (solo para el sujeto 27_HC036101.PAR)
 % Recorrer cada archivo
@@ -556,26 +560,26 @@ for i = 1:num_healthy_people
     end
     
     % Guardar los datos en la estructura
-    struct_dls_sano(i).name_file = erase(filename_sano, '.PAR');
+    struct_lds_sano(i).name_file = erase(filename_sano, '.PAR');
 
     if temp == 1
-        struct_dls_sano(i).signal_pam = columnas_sano(:, 2); % PAM es la columna 2 para 23_ALSA
-        struct_dls_sano(i).signal_vscd = columnas_sano(:, 1); % VSCd es la columna 1 23_ALSA
-        struct_dls_sano(i).signal_vsci = columnas_sano(:, 3); % VSCi es la tercera columna para 23_ALSA
+        struct_lds_sano(i).signal_pam = columnas_sano(:, 2); % PAM es la columna 2 para 23_ALSA
+        struct_lds_sano(i).signal_vscd = columnas_sano(:, 1); % VSCd es la columna 1 23_ALSA
+        struct_lds_sano(i).signal_vsci = columnas_sano(:, 3); % VSCi es la tercera columna para 23_ALSA
         temp = 0;
     else
-        struct_dls_sano(i).signal_pam = columnas_sano(:, 3); % PAM es la columna 3 para los los sanos restantes
-        struct_dls_sano(i).signal_vscd = columnas_sano(:, 1); % VSCd es la columna 1 para los sanos restantes
-        struct_dls_sano(i).signal_vsci = columnas_sano(:, 2); % VSCi es la columna 2 para los sanos restantes
+        struct_lds_sano(i).signal_pam = columnas_sano(:, 3); % PAM es la columna 3 para los los sanos restantes
+        struct_lds_sano(i).signal_vscd = columnas_sano(:, 1); % VSCd es la columna 1 para los sanos restantes
+        struct_lds_sano(i).signal_vsci = columnas_sano(:, 2); % VSCi es la columna 2 para los sanos restantes
     end
     % Guardar las señales en archivos CSV dentro de la carpeta correspondiente
     pam_sano_csv_path = fullfile(folderName_sano, 'signal_pam.csv');
     vscd_sano_csv_path = fullfile(folderName_sano, 'signal_vscd.csv');
     vsci_sano_csv_path = fullfile(folderName_sano, 'signal_vsci.csv');
     
-    writematrix(struct_dls_sano(i).signal_pam, pam_sano_csv_path);
-    writematrix(struct_dls_sano(i).signal_vscd, vscd_sano_csv_path);
-    writematrix(struct_dls_sano(i).signal_vsci, vsci_sano_csv_path);
+    writematrix(struct_lds_sano(i).signal_pam, pam_sano_csv_path);
+    writematrix(struct_lds_sano(i).signal_vscd, vscd_sano_csv_path);
+    writematrix(struct_lds_sano(i).signal_vsci, vsci_sano_csv_path);
 end
 
 
@@ -596,7 +600,7 @@ num_tec_people = numel(fileList_tec);
 % Inicializar las estructuras
 structure_vscd_noises_tec(num_of_noises_signals) = struct('pam_noise', [], 'matrix_complex_pam', [], 'scalscfs_pam_noise', [], 'psif_pam_noise', [],  'vscd_noise', [], 'matrix_complex_vscd', [], 'scalscfs_vscd_noise', [], 'psif_vscd_noise', []);
 structure_vsci_noises_tec(num_of_noises_signals) = struct('pam_noise', [], 'matrix_complex_pam', [], 'scalscfs_pam_noise', [], 'psif_pam_noise', [],  'vsci_noise', [], 'matrix_complex_vsci', [], 'scalscfs_vsci_noise', [], 'psif_vsci_noise', []);
-struct_dls_tec(num_tec_people) = struct('name_file', '', 'signal_pam', [], 'signal_vscd', [], 'signal_vsci', [], 'struct_VSCd_noises', structure_vscd_noises_tec, 'struct_VSCi_noises', structure_vsci_noises_tec);
+struct_lds_tec(num_tec_people) = struct('name_file', '', 'signal_pam', [], 'signal_vscd', [], 'signal_vsci', [], 'struct_VSCd_noises', structure_vscd_noises_tec, 'struct_VSCi_noises', structure_vsci_noises_tec, 'struct_original_PAM', [], 'struct_original_VSCd', [], 'struct_original_VSCi', []);
 
 temp = 0; % activador para considerar que la senal que el archivo 6_HASTI007 tiene como delimitador un '\t' y no un ' ' como los otros archivos
 % Recorrer cada archivo
@@ -626,22 +630,22 @@ for i = 1:num_tec_people
     end
     
     % Guardar los datos en la estructura
-    struct_dls_tec(i).name_file = erase(filename_tec, '.PAR');
+    struct_lds_tec(i).name_file = erase(filename_tec, '.PAR');
 
     % se guardan columnas especificas en la respectiva estructura del
     % paciente:
-    struct_dls_tec(i).signal_pam = columnas_tec(:, 2); % PAM: 2 columna
-    struct_dls_tec(i).signal_vscd = columnas_tec(:, 1); % VSCd derecho (chanel 1): columna 1
-    struct_dls_tec(i).signal_vsci = columnas_tec(:, 3); % VSCi izquierdo (chanel 2): columna 3
+    struct_lds_tec(i).signal_pam = columnas_tec(:, 2); % PAM: 2 columna
+    struct_lds_tec(i).signal_vscd = columnas_tec(:, 1); % VSCd derecho (chanel 1): columna 1
+    struct_lds_tec(i).signal_vsci = columnas_tec(:, 3); % VSCi izquierdo (chanel 2): columna 3
 
     % Guardar las señales en archivos CSV dentro de la carpeta correspondiente
     pam_tec_csv_path = fullfile(folderName_tec, 'signal_pam.csv');
     vscd_tec_csv_path = fullfile(folderName_tec, 'signal_vscd.csv');
     vsci_tec_csv_path = fullfile(folderName_tec, 'signal_vsci.csv');
     
-    writematrix(struct_dls_tec(i).signal_pam, pam_tec_csv_path);
-    writematrix(struct_dls_tec(i).signal_vscd, vscd_tec_csv_path);
-    writematrix(struct_dls_tec(i).signal_vsci, vsci_tec_csv_path);
+    writematrix(struct_lds_tec(i).signal_pam, pam_tec_csv_path);
+    writematrix(struct_lds_tec(i).signal_vscd, vscd_tec_csv_path);
+    writematrix(struct_lds_tec(i).signal_vsci, vsci_tec_csv_path);
 end
 
 
@@ -659,7 +663,7 @@ fs = 1.0 / ts; % Hz
 
 % Aplicacion de ruido gaussinano y filtro octavo orden a las senales PAM,
 % VSCd y VSCi tanto de sujetos sanos como de pacientes TEC:
-apply_noise_and_filter_dls(struct_dls_sano, struct_dls_tec, fs, num_of_noises_signals);
+apply_noise_and_filter_dls(struct_lds_sano, struct_lds_tec, fs, num_of_noises_signals);
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -828,13 +832,13 @@ for index = 1:numel(folder_names_sano)
         data_vsci_noises_sanos = readmatrix(path_vsci_noises_sanos); 
 
         % Asignar a la estructura
-        struct_dls_sano(index).struct_VSCd_noises(j).name_file_noise = ['Ruido', num2str(j)]; % Guardar el nombre del archivo
+        struct_lds_sano(index).struct_VSCd_noises(j).name_file_noise = ['Ruido', num2str(j)]; % Guardar el nombre del archivo
         % Lado derecho cerebro
-        struct_dls_sano(index).struct_VSCd_noises(j).pam_noise = data_pam_noises_sanos; % Guardar la senal PAM con ruido
-        struct_dls_sano(index).struct_VSCd_noises(j).vscd_noise = data_vscd_noises_sanos; % Guardar la senal VSCd con ruido
+        struct_lds_sano(index).struct_VSCd_noises(j).pam_noise = data_pam_noises_sanos; % Guardar la senal PAM con ruido
+        struct_lds_sano(index).struct_VSCd_noises(j).vscd_noise = data_vscd_noises_sanos; % Guardar la senal VSCd con ruido
         % Lado izquierdo cerebro
-        struct_dls_sano(index).struct_VSCi_noises(j).pam_noise = data_pam_noises_sanos; % Guardar la senal PAM con ruido
-        struct_dls_sano(index).struct_VSCi_noises(j).vsci_noise = data_vsci_noises_sanos; % Guardar la senal VSCi con ruido
+        struct_lds_sano(index).struct_VSCi_noises(j).pam_noise = data_pam_noises_sanos; % Guardar la senal PAM con ruido
+        struct_lds_sano(index).struct_VSCi_noises(j).vsci_noise = data_vsci_noises_sanos; % Guardar la senal VSCi con ruido
 
 
         %########################################
@@ -845,39 +849,38 @@ for index = 1:numel(folder_names_sano)
         % Wavelet:amor
         
         % [PAM NOISE - CWT]
-        [coefs_pam_noise, freqs_pam_noise, scalcfs_pam_noise, psif_pam_noise] = cwt(struct_dls_sano(index).struct_VSCd_noises(j).pam_noise);
+        [coefs_pam_noise, freqs_pam_noise, scalcfs_pam_noise, psif_pam_noise] = cwt(struct_lds_sano(index).struct_VSCd_noises(j).pam_noise);
         % [VSC NOISE - CWT]
-        [coefs_vscd_noise, freqs_vscd_noise, scalcfs_vscd_noise, psif_vscd_noise] = cwt(struct_dls_sano(index).struct_VSCd_noises(j).vscd_noise);
+        [coefs_vscd_noise, freqs_vscd_noise, scalcfs_vscd_noise, psif_vscd_noise] = cwt(struct_lds_sano(index).struct_VSCd_noises(j).vscd_noise);
         % [VSC NOISE - CWT]
-        [coefs_vsci_noise, freqs_vsci_noise, scalcfs_vsci_noise, psif_vsci_noise] = cwt(struct_dls_sano(index).struct_VSCi_noises(j).vsci_noise);
+        [coefs_vsci_noise, freqs_vsci_noise, scalcfs_vsci_noise, psif_vsci_noise] = cwt(struct_lds_sano(index).struct_VSCi_noises(j).vsci_noise);
 
-        
         % Almacenando nueva informacion en la respectiva estructura de senales
         % con ruido:
         
         % Almacenando coeficientes (matriz compleja)
-        struct_dls_sano(index).struct_VSCd_noises(j).matrix_complex_pam = coefs_pam_noise; % PAM lado derecho
-        struct_dls_sano(index).struct_VSCi_noises(j).matrix_complex_pam = coefs_pam_noise; % PAM lado izquierdo
-        struct_dls_sano(index).struct_VSCd_noises(j).matrix_complex_vscd = coefs_vscd_noise; % VSCd
-        struct_dls_sano(index).struct_VSCi_noises(j).matrix_complex_vsci = coefs_vsci_noise; % VSCi
+        struct_lds_sano(index).struct_VSCd_noises(j).matrix_complex_pam = coefs_pam_noise; % PAM lado derecho
+        struct_lds_sano(index).struct_VSCi_noises(j).matrix_complex_pam = coefs_pam_noise; % PAM lado izquierdo
+        struct_lds_sano(index).struct_VSCd_noises(j).matrix_complex_vscd = coefs_vscd_noise; % VSCd
+        struct_lds_sano(index).struct_VSCi_noises(j).matrix_complex_vsci = coefs_vsci_noise; % VSCi
     
         % Almacenando escalas de coeficientes (vector fila 1D real , largo 1024)
-        struct_dls_sano(index).struct_VSCd_noises(j).scalscfs_pam_noise = scalcfs_pam_noise; % PAM lado derecho
-        struct_dls_sano(index).struct_VSCi_noises(j).scalscfs_pam_noise = scalcfs_pam_noise; % PAM lado derecho
-        struct_dls_sano(index).struct_VSCd_noises(j).scalscfs_vscd_noise = scalcfs_vscd_noise; % VSCd
-        struct_dls_sano(index).struct_VSCi_noises(j).scalscfs_vscd_noise = scalcfs_vsci_noise; % VSCd
+        struct_lds_sano(index).struct_VSCd_noises(j).scalscfs_pam_noise = scalcfs_pam_noise; % PAM lado derecho
+        struct_lds_sano(index).struct_VSCi_noises(j).scalscfs_pam_noise = scalcfs_pam_noise; % PAM lado derecho
+        struct_lds_sano(index).struct_VSCd_noises(j).scalscfs_vscd_noise = scalcfs_vscd_noise; % VSCd
+        struct_lds_sano(index).struct_VSCi_noises(j).scalscfs_vscd_noise = scalcfs_vsci_noise; % VSCd
     
         % Almacenando respuestas de filtros (matriz real 30x1024)
-        struct_dls_sano(index).struct_VSCd_noises(j).psif_pam_noise = psif_pam_noise; % PAM lado derecho
-        struct_dls_sano(index).struct_VSCi_noises(j).psif_pam_noise = psif_pam_noise; % PAM lado derecho
-        struct_dls_sano(index).struct_VSCd_noises(j).psif_vscd_noise = psif_vscd_noise; % VSCd
-        struct_dls_sano(index).struct_VSCi_noises(j).psif_vsci_noise = psif_vsci_noise; % VSCi
+        struct_lds_sano(index).struct_VSCd_noises(j).psif_pam_noise = psif_pam_noise; % PAM lado derecho
+        struct_lds_sano(index).struct_VSCi_noises(j).psif_pam_noise = psif_pam_noise; % PAM lado derecho
+        struct_lds_sano(index).struct_VSCd_noises(j).psif_vscd_noise = psif_vscd_noise; % VSCd
+        struct_lds_sano(index).struct_VSCi_noises(j).psif_vsci_noise = psif_vsci_noise; % VSCi
 
         % Almacenando frecuencias (para mostrar escalograma)
-        struct_dls_sano(index).struct_VSCd_noises(j).freqs_pam_noise = freqs_pam_noise; % PAM lado derecho
-        struct_dls_sano(index).struct_VSCi_noises(j).freqs_pam_noise = freqs_pam_noise; % PAM lado derecho
-        struct_dls_sano(index).struct_VSCd_noises(j).freqs_vscd_noise = freqs_vscd_noise; % VSCd
-        struct_dls_sano(index).struct_VSCi_noises(j).freqs_vsci_noise = freqs_vsci_noise; % VSCi 
+        struct_lds_sano(index).struct_VSCd_noises(j).freqs_pam_noise = freqs_pam_noise; % PAM lado derecho
+        struct_lds_sano(index).struct_VSCi_noises(j).freqs_pam_noise = freqs_pam_noise; % PAM lado derecho
+        struct_lds_sano(index).struct_VSCd_noises(j).freqs_vscd_noise = freqs_vscd_noise; % VSCd
+        struct_lds_sano(index).struct_VSCi_noises(j).freqs_vsci_noise = freqs_vsci_noise; % VSCi 
         %==========================================================================================================================================
 
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -902,13 +905,13 @@ for index = 1:numel(folder_names_sano)
         data_vsci_noises_tec = readmatrix(path_vsci_noises_tecs); 
 
         % Asignar a la estructura
-        struct_dls_tec(index).struct_VSCd_noises(j).name_file_noise = ['Ruido', num2str(j)]; % Guardar el nombre del archivo
+        struct_lds_tec(index).struct_VSCd_noises(j).name_file_noise = ['Ruido', num2str(j)]; % Guardar el nombre del archivo
         % Lado derecho cerebro
-        struct_dls_tec(index).struct_VSCd_noises(j).pam_noise = data_pam_noises_tec; % Guardar la senal PAM con ruido
-        struct_dls_tec(index).struct_VSCd_noises(j).vscd_noise = data_vscd_noises_tec; % Guardar la senal VSCd con ruido
+        struct_lds_tec(index).struct_VSCd_noises(j).pam_noise = data_pam_noises_tec; % Guardar la senal PAM con ruido
+        struct_lds_tec(index).struct_VSCd_noises(j).vscd_noise = data_vscd_noises_tec; % Guardar la senal VSCd con ruido
         % Lado izquierdo cerebro
-        struct_dls_tec(index).struct_VSCi_noises(j).pam_noise = data_pam_noises_tec; % Guardar la senal PAM con ruido
-        struct_dls_tec(index).struct_VSCi_noises(j).vsci_noise = data_vsci_noises_tec; % Guardar la senal VSCi con ruido
+        struct_lds_tec(index).struct_VSCi_noises(j).pam_noise = data_pam_noises_tec; % Guardar la senal PAM con ruido
+        struct_lds_tec(index).struct_VSCi_noises(j).vsci_noise = data_vsci_noises_tec; % Guardar la senal VSCi con ruido
 
 
         %########################################
@@ -919,41 +922,102 @@ for index = 1:numel(folder_names_sano)
         % Wavelet:amor
         
         % [PAM NOISE - CWT]
-        [coefs_pam_noise, freqs_pam_noise, scalcfs_pam_noise, psif_pam_noise] = cwt(struct_dls_tec(index).struct_VSCd_noises(j).pam_noise);
+        [coefs_pam_noise, freqs_pam_noise, scalcfs_pam_noise, psif_pam_noise] = cwt(struct_lds_tec(index).struct_VSCd_noises(j).pam_noise);
         % [VSC NOISE - CWT]
-        [coefs_vscd_noise, freqs_vscd_noise, scalcfs_vscd_noise, psif_vscd_noise] = cwt(struct_dls_tec(index).struct_VSCd_noises(j).vscd_noise);
+        [coefs_vscd_noise, freqs_vscd_noise, scalcfs_vscd_noise, psif_vscd_noise] = cwt(struct_lds_tec(index).struct_VSCd_noises(j).vscd_noise);
         % [VSC NOISE - CWT]
-        [coefs_vsci_noise, freqs_vsci_noise, scalcfs_vsci_noise, psif_vsci_noise] = cwt(struct_dls_tec(index).struct_VSCi_noises(j).vsci_noise);
+        [coefs_vsci_noise, freqs_vsci_noise, scalcfs_vsci_noise, psif_vsci_noise] = cwt(struct_lds_tec(index).struct_VSCi_noises(j).vsci_noise);
 
         
         % Almacenando nueva informacion en la respectiva estructura de senales
         % con ruido:
         
         % Almacenando coeficientes (matriz compleja)
-        struct_dls_tec(index).struct_VSCd_noises(j).matrix_complex_pam = coefs_pam_noise; % PAM lado derecho
-        struct_dls_tec(index).struct_VSCi_noises(j).matrix_complex_pam = coefs_pam_noise; % PAM lado izquierdo
-        struct_dls_tec(index).struct_VSCd_noises(j).matrix_complex_vscd = coefs_vscd_noise; % VSCd
-        struct_dls_tec(index).struct_VSCi_noises(j).matrix_complex_vsci = coefs_vsci_noise; % VSCi
+        struct_lds_tec(index).struct_VSCd_noises(j).matrix_complex_pam = coefs_pam_noise; % PAM lado derecho
+        struct_lds_tec(index).struct_VSCi_noises(j).matrix_complex_pam = coefs_pam_noise; % PAM lado izquierdo
+        struct_lds_tec(index).struct_VSCd_noises(j).matrix_complex_vscd = coefs_vscd_noise; % VSCd
+        struct_lds_tec(index).struct_VSCi_noises(j).matrix_complex_vsci = coefs_vsci_noise; % VSCi
     
         % Almacenando escalas de coeficientes (vector fila 1D real , largo 1024)
-        struct_dls_tec(index).struct_VSCd_noises(j).scalscfs_pam_noise = scalcfs_pam_noise; % PAM lado derecho
-        struct_dls_tec(index).struct_VSCi_noises(j).scalscfs_pam_noise = scalcfs_pam_noise; % PAM lado derecho
-        struct_dls_tec(index).struct_VSCd_noises(j).scalscfs_vscd_noise = scalcfs_vscd_noise; % VSCd
-        struct_dls_tec(index).struct_VSCi_noises(j).scalscfs_vscd_noise = scalcfs_vsci_noise; % VSCd
+        struct_lds_tec(index).struct_VSCd_noises(j).scalscfs_pam_noise = scalcfs_pam_noise; % PAM lado derecho
+        struct_lds_tec(index).struct_VSCi_noises(j).scalscfs_pam_noise = scalcfs_pam_noise; % PAM lado derecho
+        struct_lds_tec(index).struct_VSCd_noises(j).scalscfs_vscd_noise = scalcfs_vscd_noise; % VSCd
+        struct_lds_tec(index).struct_VSCi_noises(j).scalscfs_vscd_noise = scalcfs_vsci_noise; % VSCd
     
         % Almacenando respuestas de filtros (matriz real 30x1024)
-        struct_dls_tec(index).struct_VSCd_noises(j).psif_pam_noise = psif_pam_noise; % PAM lado derecho
-        struct_dls_tec(index).struct_VSCi_noises(j).psif_pam_noise = psif_pam_noise; % PAM lado derecho
-        struct_dls_tec(index).struct_VSCd_noises(j).psif_vscd_noise = psif_vscd_noise; % VSCd
-        struct_dls_tec(index).struct_VSCi_noises(j).psif_vsci_noise = psif_vsci_noise; % VSCi
+        struct_lds_tec(index).struct_VSCd_noises(j).psif_pam_noise = psif_pam_noise; % PAM lado derecho
+        struct_lds_tec(index).struct_VSCi_noises(j).psif_pam_noise = psif_pam_noise; % PAM lado derecho
+        struct_lds_tec(index).struct_VSCd_noises(j).psif_vscd_noise = psif_vscd_noise; % VSCd
+        struct_lds_tec(index).struct_VSCi_noises(j).psif_vsci_noise = psif_vsci_noise; % VSCi
 
         % Almacenando frecuencias (para mostrar escalograma)
-        struct_dls_tec(index).struct_VSCd_noises(j).freqs_pam_noise = freqs_pam_noise; % PAM lado derecho
-        struct_dls_tec(index).struct_VSCi_noises(j).freqs_pam_noise = freqs_pam_noise; % PAM lado derecho
-        struct_dls_tec(index).struct_VSCd_noises(j).freqs_vscd_noise = freqs_vscd_noise; % VSCd
-        struct_dls_tec(index).struct_VSCi_noises(j).freqs_vsci_noise = freqs_vsci_noise; % VSCi 
+        struct_lds_tec(index).struct_VSCd_noises(j).freqs_pam_noise = freqs_pam_noise; % PAM lado derecho
+        struct_lds_tec(index).struct_VSCi_noises(j).freqs_pam_noise = freqs_pam_noise; % PAM lado derecho
+        struct_lds_tec(index).struct_VSCd_noises(j).freqs_vscd_noise = freqs_vscd_noise; % VSCd
+        struct_lds_tec(index).struct_VSCi_noises(j).freqs_vsci_noise = freqs_vsci_noise; % VSCi 
         %==========================================================================================================================================
     end
+    
+    % Aqui ya se han calculados todas las cwt de cada senal con ruido de
+    % PAM, VSCd y VSCd. Ahora se procede a calcular los coeficientes(matrices complejas)
+    % de las senales originales sin ruido.
+
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % PARA SENALES ORIGINALES DE PAM, VSCd Y VSCi del sujeto index:
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    
+    % SUJETO SANO
+    % [ORIGINAL PAM - CWT]
+    [coefs_original_pam, freqs_original_pam, scalcfs_original_pam, psif_original_pam] = cwt(struct_lds_sano(index).signal_pam);
+    % [ORIGINAL VSCd - CWT]
+    [coefs_original_vscd, freqs_original_vscd, scalcfs_original_vscd, psif_original_vscd] = cwt(struct_lds_sano(index).signal_vscd);
+    % [ORIGINAL VSCi- CWT]
+    [coefs_original_vsci, freqs_original_vsci, scalcfs_original_vsci, psif_original_vsci] = cwt(struct_lds_sano(index).signal_vsci);
+    
+    % SUJETO SANO
+    % Almacenando datos del sujeto index en la respectiva estructura
+    % SUJETO SANO - ORIGINAL PAM
+    struct_lds_sano(index).struct_original_PAM(1).matrix_complex_original_pam = coefs_original_pam;
+    struct_lds_sano(index).struct_original_PAM(1).scalscfs_original_pam = scalcfs_original_pam;
+    struct_lds_sano(index).struct_original_PAM(1).psif_original_pam = psif_original_pam;
+    struct_lds_sano(index).struct_original_PAM(1).freqs_original_pam = freqs_original_pam;
+    % SUJETO SANO - ORIGINAL VSCd
+    struct_lds_sano(index).struct_original_VSCd(1).matrix_complex_original_vscd = coefs_original_vscd;
+    struct_lds_sano(index).struct_original_VSCd(1).scalscfs_original_vscd = scalcfs_original_vscd;
+    struct_lds_sano(index).struct_original_VSCd(1).psif_original_vscd = psif_original_vscd;
+    struct_lds_sano(index).struct_original_VSCd(1).freqs_original_vscd = freqs_original_vscd;
+    % SUJETO SANO - ORIGINAL VSCi
+    struct_lds_sano(index).struct_original_VSCi(1).matrix_complex_original_vsci = coefs_original_vsci;
+    struct_lds_sano(index).struct_original_VSCi(1).scalscfs_original_vsci = scalcfs_original_vsci;
+    struct_lds_sano(index).struct_original_VSCi(1).psif_original_vsci = psif_original_vsci;
+    struct_lds_sano(index).struct_original_VSCi(1).freqs_original_vsci = freqs_original_vsci;
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+    % PACIENTE TEC
+    % [ORIGINAL PAM - CWT]
+    [coefs_original_pam, freqs_original_pam, scalcfs_original_pam, psif_original_pam] = cwt(struct_lds_tec(index).signal_pam);
+    % [ORIGINAL VSCd - CWT]
+    [coefs_original_vscd, freqs_original_vscd, scalcfs_original_vscd, psif_original_vscd] = cwt(struct_lds_tec(index).signal_vscd);
+    % [ORIGINAL VSCi- CWT]
+    [coefs_original_vsci, freqs_original_vsci, scalcfs_original_vsci, psif_original_vsci] = cwt(struct_lds_tec(index).signal_vsci);
+    
+    % PACIENTE TEC
+    % Almacenando datos del sujeto index en la respectiva estructura
+    % PACIENTE TEC - ORIGINAL PAM
+    struct_lds_tec(index).struct_original_PAM(1).matrix_complex_original_pam = coefs_original_pam;
+    struct_lds_tec(index).struct_original_PAM(1).scalscfs_original_pam = scalcfs_original_pam;
+    struct_lds_tec(index).struct_original_PAM(1).psif_original_pam = psif_original_pam;
+    struct_lds_tec(index).struct_original_PAM(1).freqs_original_pam = freqs_original_pam;
+    % PACIENTE TEC - ORIGINAL VSCd
+    struct_lds_tec(index).struct_original_VSCd(1).matrix_complex_original_vscd = coefs_original_vscd;
+    struct_lds_tec(index).struct_original_VSCd(1).scalscfs_original_vscd = scalcfs_original_vscd;
+    struct_lds_tec(index).struct_original_VSCd(1).psif_original_vscd = psif_original_vscd;
+    struct_lds_tec(index).struct_original_VSCd(1).freqs_original_vscd = freqs_original_vscd;
+    % PACIENTE TEC - ORIGINAL VSCi
+    struct_lds_tec(index).struct_original_VSCi(1).matrix_complex_original_vsci = coefs_original_vsci;
+    struct_lds_tec(index).struct_original_VSCi(1).scalscfs_original_vsci = scalcfs_original_vsci;
+    struct_lds_tec(index).struct_original_VSCi(1).psif_original_vsci = psif_original_vsci;
+    struct_lds_tec(index).struct_original_VSCi(1).freqs_original_vsci = freqs_original_vsci;
 end
 
 
@@ -962,21 +1026,21 @@ directory_structs = 'D:\TT\Memoria\MemoriaCodigoFuentev3\codigo_matlab\codigo_fu
 
 %============== Sanos ==================================================
 % Especifica el nombre del archivo
-filename_struct_sano = 'struct_dls_sano.mat';
+filename_struct_sano = 'struct_lds_sano.mat';
 % Crea la ruta completa del archivo
 filepath_struct_sano = fullfile(directory_structs, filename_struct_sano);
 % Guarda la estructura en el archivo .mat
-save(filepath_struct_sano, 'struct_dls_sano', '-v7.3');
+save(filepath_struct_sano, 'struct_lds_sano', '-v7.3');
 % Mensaje de confirmación
 fprintf("(*) La estructura para sujetos sanos se ha guardado correctamente\n");
 
 %============== TEC ==================================================
 % Especifica el nombre del archivo
-filename_struct_tec = 'struct_dls_tec.mat';
+filename_struct_tec = 'struct_lds_tec.mat';
 % Crea la ruta completa del archivo
 filepath_struct_tec = fullfile(directory_structs, filename_struct_tec);
 % Guarda la estructura en el archivo .mat
-save(filepath_struct_tec, 'struct_dls_tec', '-v7.3');
+save(filepath_struct_tec, 'struct_lds_tec', '-v7.3');
 % Mensaje de confirmación
 fprintf("(*) La estructura para pacientes TEC se ha guardado correctamente\n");
 
@@ -1063,8 +1127,8 @@ for i = 1:num_people
 
     % Se obtiene el sujeto sano i y el paciente tec i de sus respectivas
     % estructuras.
-    person_sano = struct_dls_sano(i);
-    person_tec = struct_dls_tec(i);
+    person_sano = struct_lds_sano(i);
+    person_tec = struct_lds_tec(i);
     fprintf("[%i] Rellenando carpetas: SANO: %s || TEC: %s ...\n", i, foldernames_sanos{i}, foldernames_tecs{i});
     fprintf("[%i] Guardando matrices complejas (PAM, VSCd y VSCi) de: SANO %s || TEC: %s\n",i, person_sano.name_file, person_tec.name_file);
     for j = 1:num_matrix_complexs
@@ -1093,3 +1157,12 @@ for i = 1:num_people
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     end
 end
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%% GENERACION DE COEFICIENTES DE SENALES ORIGINALES PARA PREDECIR UNA SALIDA EN LA RED %%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+

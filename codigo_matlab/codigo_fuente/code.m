@@ -1193,7 +1193,7 @@ for i = 1:num_people
         save(fullfile(direct_final_cfs_vscd_tec, sprintf('matrix_complex_vscd_noise_%d.mat', j)), 'matrix_complex_vscd_tec');
         % Guardar matriz_complex_vsci
         matrix_complex_vsci_tec = person_tec.struct_VSCi_noises(j).matrix_complex_vsci;
-        save(fullfile(direct_final_cfs_vsci_tec, sprintf('matrix_complex_vsc_noise_%d.mat', j)), 'matrix_complex_vsci_tec');
+        save(fullfile(direct_final_cfs_vsci_tec, sprintf('matrix_complex_vsci_noise_%d.mat', j)), 'matrix_complex_vsci_tec');
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     end
     % PARA SUJETO SANO

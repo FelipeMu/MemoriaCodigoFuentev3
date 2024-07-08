@@ -1222,6 +1222,10 @@ end
 
 
 
+
+
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%% ANALISIS DE LA ESTIMACION DE LOS COEFICIENTES POR MEDIO DE UNA COMPARACION DE CURVAS DE LAS SENALES %%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1332,39 +1336,36 @@ for i = 1:num_people
     % Creando las respectivas 2 carpetas, sino existen se crean.
     % Directorios para guardar los coeficientes predichos de VSCd y VSCi
 
-    % Nombre que tendran las respectivas carpetas:
-    name_folder_CoefficientsPredicted_VSCd = '/CoefficientsPredicted_VSCd'; % para coeficientes predichos de VSC derecha
-    name_folder_CoefficientsPredicted_VSCi = '/CoefficientsPredicted_VSCi'; % para coeficientes predichos de VSC izquierda
+    % Nombres d que tendran las respectivas carpetas:
+    name_folder_CoefficientsPredicted_VSCd = '/CoefficientsPredicted_VSCd';
+    name_folderCoefficientsPredicted_VSCi = '/CoefficientsPredicted_VSCi';
 
     % Directorio donde se crearan dichas carpetas (2 total:
     % name_folder_CoefficientsPredicted_VSCd y name_folderCoefficientsPredicted_VSCi)
     % *** SANO ***
-    direct_final_CoefficientsPredicted_VSCd_sano = fullfile(direct_folder_sano_i, name_folder_CoefficientsPredicted_VSCd);
-    direct_final_CoefficientsPredicted_VSCi_sano = fullfile(direct_folder_sano_i, name_folder_CoefficientsPredicted_VSCi);
-
+    direct_final_cfs_pam_sano = fullfile(direct_folder_sano_i, name_folder_CoefficientsPredicted_VSCd);
+    direct_final_cfs_vscd_sano = fullfile(direct_folder_sano_i, name_folderCoefficientsPredicted_VSCi);
     % Directorio donde se crearan dichas carpetas (2 total:
     % name_folder_CoefficientsPredicted_VSCd y name_folderCoefficientsPredicted_VSCi)
     % *** TEC ***
-    direct_final_CoefficientsPredicted_VSCd_tec = fullfile(direct_folder_tec_i, name_folder_CoefficientsPredicted_VSCd);
-    direct_final_CoefficientsPredicted_VSCi_tec = fullfile(direct_folder_tec_i, name_folder_CoefficientsPredicted_VSCi);
-
-    % Creando carpetas si no existen...
-    %%%% SANO %%%%
-    if ~exist(direct_final_CoefficientsPredicted_VSCd_sano, 'dir')
-        mkdir(direct_final_CoefficientsPredicted_VSCd_sano);
-    end
-    if ~exist(direct_final_CoefficientsPredicted_VSCi_sano, 'dir')
-        mkdir(direct_final_CoefficientsPredicted_VSCi_sano);
-    end
-    %%%%% TEC %%%%
-    if ~exist(direct_final_CoefficientsPredicted_VSCd_tec, 'dir')
-        mkdir(direct_final_CoefficientsPredicted_VSCd_tec);
-    end
-    if ~exist(direct_final_CoefficientsPredicted_VSCi_tec, 'dir')
-        mkdir(direct_final_CoefficientsPredicted_VSCi_tec);
-    end
-
+    direct_final_cfs_pam_sano = fullfile(direct_folder_sano_i, name_folder_CoefficientsPredicted_VSCd);
+    direct_final_cfs_vscd_sano = fullfile(direct_folder_sano_i, name_folderCoefficientsPredicted_VSCi);
 end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -1231,7 +1231,7 @@ end
 
 %###################################################################
 %###################################################################
-% Se calcula la ICWT de la senal VSCD o VSCi con la matriz d compleja
+% Se calcula la ICWT de la senal VSCD o VSCi con la matriz compleja
 % (coeficientes) ORIGINAL
 %###################################################################
 %###################################################################
@@ -1372,24 +1372,26 @@ end
 %###########################################################
 %############# lectura coeficientes predichos ##############
 %###########################################################
+
+
 % Especificar el directorio donde esta el archivo .mat
-coefs_predicted_dir = 'D:/TT/Memoria/waveletycnn/codigo_matlab/codigo_fuente/coefs_vsc_predicted';
+coefs_predicted_dir = 'D:/TT/Memoria/MemoriaCodigoFuentev3/codigo_matlab/codigo_fuente/signals_LDS/SANOS/1_HEMU/CoefficientsPredicted_VSCd';
 
 % Nombre del archivo .mat
-coefs_predicted_filename = 'coefs_vsc_predicted';
+coefs_predicted_filename = 'matrix_complex_vscd_predicted';
 
 % Ruta completa del archivo .mat
 coefs_predicted_path = fullfile(coefs_predicted_dir, coefs_predicted_filename);
 
 % Cargar el archivo .mat y guardar el contenido en una variable
-coefs_vsc_predicted_by_unet_struct = load(coefs_predicted_path);
+coefs_vscd_predicted_by_unet_struct = load(coefs_predicted_path);
 % see extrae la matriz compleja
-coefs_vsc_predicted_by_unet = cast(coefs_vsc_predicted_by_unet_struct(1).complex_matrix_vsc, 'double');
+coefs_vscd_predicted_by_unet = cast(coefs_vscd_predicted_by_unet_struct(1).matrix_complex_vscd_predicted, 'double');
 
 
 % Se procede a aplicar la ICWT con el uso de los coeficientes predichos por
 % la red U-net:
- get_signal_vsc_estimated_with_coefs_unet = icwt(coefs_vsc_predicted_by_unet,[], ScalingCoefficients = scalcfs_vsc_original_to_predict, AnalysisFilterBank = psif_vsc_to_predict); % se realiza la transformada inversa continua de la senal
+ get_signal_vsc_estimated_with_coefs_unet = icwt(coefs_vscd_predicted_by_unet,[], ScalingCoefficients = scalcfs_vsc_original_to_predict, AnalysisFilterBank = psif_vsc_to_predict); % se realiza la transformada inversa continua de la senal
  get_signal_vsc_estimated_with_coefs_unet = get_signal_vsc_estimated_with_coefs_unet(:); % la reconstruccion de la senal estimada por los coeficientes predichos se pasa a formato vector columna
  error_signal_original_and_predicted = get_nmse(signal_vsc_to_predict, get_signal_vsc_estimated_with_coefs_unet); % se calcula el nmse
 

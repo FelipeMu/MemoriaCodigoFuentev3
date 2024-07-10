@@ -1488,3 +1488,44 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+% Definir el número total de instancias
+n = 1024;
+
+% Definir el número de instancias con valor 1
+m = 50;
+
+% Crear el vector del escalón unitario inverso
+escalon_inverso = [ones(m, 1); zeros(n - m, 1)];
+
+% Definir el orden del filtro Butterworth
+orden = 8;
+
+% Definir la frecuencia de corte en Hz
+fc = 0.7;  % Ajusta este valor según sea necesario
+
+% Definir la frecuencia de muestreo en Hz
+fs = 5;
+
+% Calcular la frecuencia de Nyquist
+fn = fs / 2;
+
+% Calcular la frecuencia de corte normalizada
+Wn = fc / fn;
+
+% Diseñar el filtro Butterworth
+[b, a] = butter(orden, Wn);
+
+% Aplicar el filtro Butterworth
+escalon_suavizado = filter(b, a, escalon_inverso);
+
+% Graficar el escalón unitario inverso y el escalón suavizado
+figure;
+plot(escalon_inverso, 'LineWidth', 2);
+hold on;
+plot(escalon_suavizado, 'LineWidth', 2);
+xlabel('Instancia');
+ylabel('Amplitud');
+title('Escalón Unitario Inverso y Suavizado con Filtro Butterworth 8 orden');
+legend('Original', 'Suavizado');
+ylim([-0.1, 1.1]);
+grid on;

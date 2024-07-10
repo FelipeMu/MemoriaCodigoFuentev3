@@ -1231,7 +1231,7 @@ end
 
 %###################################################################
 %###################################################################
-% Se calcula la ICWT de la senal VSCD o VSCi con la matriz compleja
+% Se calcula la ICWT de la senal VSCd o VSCi con la matriz compleja
 % (coeficientes) ORIGINAL
 %###################################################################
 %###################################################################
@@ -1241,9 +1241,10 @@ end
 % matriz compleja que se obtiene de la prediccion de la red U-net
 
 % Selecionar estado (SANO/TEC), lado (VSC derecho o izquierdo) e individuo a analizar -->
-estado = 'SANO';
+estado = 'SANOS';
 persona = '1_HEMU';
-lado = 'derecho';
+lado = 'izquierdo';
+lado_abrev = '';
 
 %Variables (vectores) donde se almacenaran los parametros correspondientes
 %al estado, persona y lado del individuo a analizar:
@@ -1256,16 +1257,18 @@ pivote = 0; % indice de la estructura donde se alamcena el individuo que se dese
 % Ciclo que hace get de los parametros necesarios para luego aplicar la
 % ICWT.
 for i = 1:27 % ciclo que recorre cada instancia de las estructuras (27: cantidad de individuos)
-    if strcmp(estado, 'SANO')
+    if strcmp(estado, 'SANOS')
         if strcmp(struct_lds_sano(i).name_file, persona) 
             pivote = i;
             if strcmp(lado, 'derecho')
+                lado_abrev = 'VSCd';
                 disp('GET sano-derecho');
                 coefs_vsc_original_signal_to_predict = struct_lds_sano(pivote).struct_original_VSCd.matrix_complex_original_vscd;
                 freqs_vsc_original_signal_to_predict = struct_lds_sano(pivote).struct_original_VSCd.freqs_original_vscd;
                 scalcfs_vsc_original_signal_to_predict = struct_lds_sano(pivote).struct_original_VSCd.scalscfs_original_vscd;
                 psif_vsc_original_signal_to_predict = struct_lds_sano(pivote).struct_original_VSCd.psif_original_vscd;
             else %lado=izquierdo
+                lado_abrev = 'VSCi';
                 disp('GET sano-izquierdo');
                 coefs_vsc_original_signal_to_predict = struct_lds_sano(pivote).struct_original_VSCi.matrix_complex_original_vsci;
                 freqs_vsc_original_signal_to_predict = struct_lds_sano(pivote).struct_original_VSCi.freqs_original_vsci;
@@ -1277,12 +1280,14 @@ for i = 1:27 % ciclo que recorre cada instancia de las estructuras (27: cantidad
        if strcmp(struct_lds_tec(i).name_file, persona)
             pivote = i;
             if strcmp(lado, 'derecho')
+                lado_abrev = 'VSCd';
                 disp('GET tec-derecho');
                 coefs_vsc_original_signal_to_predict = struct_lds_tec(pivote).struct_original_VSCd.matrix_complex_original_vscd;
                 freqs_vsc_original_signal_to_predict = struct_lds_tec(pivote).struct_original_VSCd.freqs_original_vscd;
                 scalcfs_vsc_original_signal_to_predict = struct_lds_tec(pivote).struct_original_VSCd.scalscfs_original_vscd;
                 psif_vsc_original_signal_to_predict = struct_lds_tec(pivote).struct_original_VSCd.psif_original_vscd;
             else %lado=izquierdo
+                lado_abrev = 'VSCi';
                 disp('GET tec-izquierdo');
                 coefs_vsc_original_signal_to_predict = struct_lds_tec(pivote).struct_original_VSCi.matrix_complex_original_vsci;
                 freqs_vsc_original_signal_to_predict = struct_lds_tec(pivote).struct_original_VSCi.freqs_original_vsci;
@@ -1366,65 +1371,120 @@ for i = 1:num_people
 
 end
 
-
-
-
-%###########################################################
-%############# lectura coeficientes predichos ##############
-%###########################################################
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%% LECTURA DE COEFS PREDICHOS Y COMPARACION DE SENALES VSC ORIGINALES Y ESTIMADAS (CURVAS Y NMSE) %%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
 % Especificar el directorio donde esta el archivo .mat
-coefs_predicted_dir = 'D:/TT/Memoria/MemoriaCodigoFuentev3/codigo_matlab/codigo_fuente/signals_LDS/SANOS/1_HEMU/CoefficientsPredicted_VSCd';
-
+coefs_predicted_dir = strcat('D:/TT/Memoria/MemoriaCodigoFuentev3/codigo_matlab/codigo_fuente/signals_LDS/', estado, '/', persona, '/CoefficientsPredicted_', lado_abrev);
+% Variables para almacenar el contenido leido por medio de load() (archivo.mat asociado a los coefs predichos)
+coefs_predicted_path = '';
+coefs_vsc_predicted_by_unet_struct = struct();
+coefs_vsc_predicted_by_unet = [];
 % Nombre del archivo .mat
-coefs_predicted_filename = 'matrix_complex_vscd_predicted';
+coefs_predicted_filename  = '';
+if strcmp(lado, 'derecho')
+    coefs_predicted_filename = 'matrix_complex_vscd_predicted';
+    % Ruta completa del archivo .mat
+    coefs_predicted_path = fullfile(coefs_predicted_dir, coefs_predicted_filename);
+    
+    % Cargar el archivo .mat y guardar el contenido en una variable
+    coefs_vsc_predicted_by_unet_struct = load(coefs_predicted_path);
+    % see extrae la matriz compleja
+    coefs_vsc_predicted_by_unet = cast(coefs_vsc_predicted_by_unet_struct(1).matrix_complex_vscd_predicted, 'double');
 
-% Ruta completa del archivo .mat
-coefs_predicted_path = fullfile(coefs_predicted_dir, coefs_predicted_filename);
-
-% Cargar el archivo .mat y guardar el contenido en una variable
-coefs_vscd_predicted_by_unet_struct = load(coefs_predicted_path);
-% see extrae la matriz compleja
-coefs_vscd_predicted_by_unet = cast(coefs_vscd_predicted_by_unet_struct(1).matrix_complex_vscd_predicted, 'double');
+else%lado=izquierdo
+    coefs_predicted_filename = 'matrix_complex_vsci_predicted';
+    % Ruta completa del archivo .mat
+    coefs_predicted_path = fullfile(coefs_predicted_dir, coefs_predicted_filename);
+    
+    % Cargar el archivo .mat y guardar el contenido en una variable
+    coefs_vsc_predicted_by_unet_struct = load(coefs_predicted_path);
+    % see extrae la matriz compleja
+    coefs_vsc_predicted_by_unet = cast(coefs_vsc_predicted_by_unet_struct(1).matrix_complex_vsci_predicted, 'double');
+end
 
 
 % Se procede a aplicar la ICWT con el uso de los coeficientes predichos por
 % la red U-net:
- get_signal_vsc_estimated_with_coefs_unet = icwt(coefs_vscd_predicted_by_unet,[], ScalingCoefficients = scalcfs_vsc_original_signal_to_predict, AnalysisFilterBank = psif_vsc_original_signal_to_predict); % se realiza la transformada inversa continua de la senal
- get_signal_vsc_estimated_with_coefs_unet = get_signal_vsc_estimated_with_coefs_unet(:); % la reconstruccion de la senal estimada por los coeficientes predichos se pasa a formato vector columna
- error_signal_original_and_predicted = get_nmse(struct_lds_sano(pivote).signal_vscd, get_signal_vsc_estimated_with_coefs_unet); % se calcula el nmse
+if strcmp(estado, "SANOS")
+    if strcmp(lado, 'derecho')
+        get_signal_vsc_estimated_with_coefs_unet = icwt(coefs_vsc_predicted_by_unet,[], ScalingCoefficients = scalcfs_vsc_original_signal_to_predict, AnalysisFilterBank = psif_vsc_original_signal_to_predict); % se realiza la transformada inversa continua de la senal
+        get_signal_vsc_estimated_with_coefs_unet = get_signal_vsc_estimated_with_coefs_unet(:); % la reconstruccion de la senal estimada por los coeficientes predichos se pasa a formato vector columna
+        error_signal_original_and_predicted = get_nmse(struct_lds_sano(pivote).signal_vscd, get_signal_vsc_estimated_with_coefs_unet); % se calcula el nmse
+        persona_print = strrep(persona, '_', '\_'); % Reemplazar subrayado con subrayado escapado
+        % comparar senales
+        figure;
+        hold on;
+        plot(struct_lds_sano(pivote).signal_vscd, 'b'); % Senal original
+        plot( get_signal_vsc_estimated_with_coefs_unet, 'r--'); % Senal reconstruida por amor
+        title(sprintf('%s: Señal VSCd original vs estimada (NMSE: %.4e)', persona_print, error_signal_original_and_predicted));
+        xlabel('Tiempo');
+        ylabel('Amplitud');
+        legend('Original', 'Reconstruida');
+        hold off;
+        
+    else%lado=izquierdo
+        get_signal_vsc_estimated_with_coefs_unet = icwt(coefs_vsc_predicted_by_unet,[], ScalingCoefficients = scalcfs_vsc_original_signal_to_predict, AnalysisFilterBank = psif_vsc_original_signal_to_predict); % se realiza la transformada inversa continua de la senal
+        get_signal_vsc_estimated_with_coefs_unet = get_signal_vsc_estimated_with_coefs_unet(:); % la reconstruccion de la senal estimada por los coeficientes predichos se pasa a formato vector columna
+        error_signal_original_and_predicted = get_nmse(struct_lds_sano(pivote).signal_vsci, get_signal_vsc_estimated_with_coefs_unet); % se calcula el nmse
+        persona_print = strrep(persona, '_', '\_'); % Reemplazar subrayado con subrayado escapado
+        % comparar senales
+        figure;
+        hold on;
+        plot(struct_lds_sano(pivote).signal_vsci, 'b'); % Senal original
+        plot( get_signal_vsc_estimated_with_coefs_unet, 'r--'); % Senal reconstruida por amor
+        title(sprintf('%s: Señal VSCi original vs estimada (NMSE: %.4e)', persona_print, error_signal_original_and_predicted));
+        xlabel('Tiempo');
+        ylabel('Amplitud');
+        legend('Original', 'Reconstruida');
+        hold off;
+    
+    end
 
-
-persona_print = strrep(persona, '_', '\_'); % Reemplazar subrayado con subrayado escapado
- % comparar senales
-figure;
-hold on;
-plot(struct_lds_sano(pivote).signal_vscd, 'b'); % Senal original
-plot( get_signal_vsc_estimated_with_coefs_unet, 'r--'); % Senal reconstruida por amor
-title(sprintf('%s: Señal VSCd original vs estimada (NMSE: %.4e)', persona_print, error_signal_original_and_predicted));
-xlabel('Tiempo');
-ylabel('Amplitud');
-legend('Original', 'Reconstruida');
-hold off;
-
-
-
-
-
-
-
-
-
-
-
+else%estado=TEC
+    if strcmp(lado, 'derecho')
+        get_signal_vsc_estimated_with_coefs_unet = icwt(coefs_vsc_predicted_by_unet,[], ScalingCoefficients = scalcfs_vsc_original_signal_to_predict, AnalysisFilterBank = psif_vsc_original_signal_to_predict); % se realiza la transformada inversa continua de la senal
+        get_signal_vsc_estimated_with_coefs_unet = get_signal_vsc_estimated_with_coefs_unet(:); % la reconstruccion de la senal estimada por los coeficientes predichos se pasa a formato vector columna
+        error_signal_original_and_predicted = get_nmse(struct_lds_tec(pivote).signal_vscd, get_signal_vsc_estimated_with_coefs_unet); % se calcula el nmse
+        persona_print = strrep(persona, '_', '\_'); % Reemplazar subrayado con subrayado escapado
+        % comparar senales
+        figure;
+        hold on;
+        plot(struct_lds_tec(pivote).signal_vscd, 'b'); % Senal original
+        plot( get_signal_vsc_estimated_with_coefs_unet, 'r--'); % Senal reconstruida por amor
+        title(sprintf('%s: Señal VSCd original vs estimada (NMSE: %.4e)', persona_print, error_signal_original_and_predicted));
+        xlabel('Tiempo');
+        ylabel('Amplitud');
+        legend('Original', 'Reconstruida');
+        hold off;
+    else
+        get_signal_vsc_estimated_with_coefs_unet = icwt(coefs_vsc_predicted_by_unet,[], ScalingCoefficients = scalcfs_vsc_original_signal_to_predict, AnalysisFilterBank = psif_vsc_original_signal_to_predict); % se realiza la transformada inversa continua de la senal
+        get_signal_vsc_estimated_with_coefs_unet = get_signal_vsc_estimated_with_coefs_unet(:); % la reconstruccion de la senal estimada por los coeficientes predichos se pasa a formato vector columna
+        error_signal_original_and_predicted = get_nmse(struct_lds_tec(pivote).signal_vsci, get_signal_vsc_estimated_with_coefs_unet); % se calcula el nmse
+        persona_print = strrep(persona, '_', '\_'); % Reemplazar subrayado con subrayado escapado
+        % comparar senales
+        figure;
+        hold on;
+        plot(struct_lds_tec(pivote).signal_vsci, 'b'); % Senal original
+        plot( get_signal_vsc_estimated_with_coefs_unet, 'r--'); % Senal reconstruida por amor
+        title(sprintf('%s: Señal VSCd original vs estimada (NMSE: %.4e)', persona_print, error_signal_original_and_predicted));
+        xlabel('Tiempo');
+        ylabel('Amplitud');
+        legend('Original', 'Reconstruida');
+        hold off;
+    end
+end
 
 
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%% GENERACION DE COEFICIENTES DE SENALES ORIGINALES PARA PREDECIR UNA SALIDA EN LA RED %%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%% GENERACION DE COEFICIENTES DE ESCALON UNITARIO INVERSO PARA PREDECIR RESPUESTA DE VSC %%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 

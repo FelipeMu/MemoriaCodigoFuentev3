@@ -1391,17 +1391,18 @@ coefs_vscd_predicted_by_unet = cast(coefs_vscd_predicted_by_unet_struct(1).matri
 
 % Se procede a aplicar la ICWT con el uso de los coeficientes predichos por
 % la red U-net:
- get_signal_vsc_estimated_with_coefs_unet = icwt(coefs_vscd_predicted_by_unet,[], ScalingCoefficients = scalcfs_vsc_original_to_predict, AnalysisFilterBank = psif_vsc_to_predict); % se realiza la transformada inversa continua de la senal
+ get_signal_vsc_estimated_with_coefs_unet = icwt(coefs_vscd_predicted_by_unet,[], ScalingCoefficients = scalcfs_vsc_original_signal_to_predict, AnalysisFilterBank = psif_vsc_original_signal_to_predict); % se realiza la transformada inversa continua de la senal
  get_signal_vsc_estimated_with_coefs_unet = get_signal_vsc_estimated_with_coefs_unet(:); % la reconstruccion de la senal estimada por los coeficientes predichos se pasa a formato vector columna
- error_signal_original_and_predicted = get_nmse(signal_vsc_to_predict, get_signal_vsc_estimated_with_coefs_unet); % se calcula el nmse
+ error_signal_original_and_predicted = get_nmse(struct_lds_sano(pivote).signal_vscd, get_signal_vsc_estimated_with_coefs_unet); % se calcula el nmse
 
 
+persona_print = strrep(persona, '_', '\_'); % Reemplazar subrayado con subrayado escapado
  % comparar senales
 figure;
 hold on;
-plot(signal_vsc_to_predict, 'b'); % Senal original
+plot(struct_lds_sano(pivote).signal_vscd, 'b'); % Senal original
 plot( get_signal_vsc_estimated_with_coefs_unet, 'r--'); % Senal reconstruida por amor
-title(sprintf('Señal VSC: Original vs Predicha (NMSE: %.2e)', error_signal_original_and_predicted));
+title(sprintf('%s: Señal VSCd original vs estimada (NMSE: %.4e)', persona_print, error_signal_original_and_predicted));
 xlabel('Tiempo');
 ylabel('Amplitud');
 legend('Original', 'Reconstruida');

@@ -771,7 +771,7 @@ end
 % Selecionar estado (SANO/TEC), lado (VSC derecho o izquierdo) e individuo a analizar -->
 estado = 'SANOS';
 persona = '1_HEMU';
-lado = 'izquierdo';
+lado = 'derecho';
 lado_abrev = '';
 
 %Variables (vectores) donde se almacenaran los parametros correspondientes
@@ -1008,8 +1008,6 @@ else%estado=TEC
 end
 
 
-
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%% GENERACION DE COEFICIENTES DE ESCALON UNITARIO INVERSO PARA PREDECIR RESPUESTA DE VSC %%%%%%%%%%%%%%%%%%%%%%%
@@ -1028,72 +1026,85 @@ end
 Ts=0.2;
 butterworth_order = 2;
 cut_freq = 0.3;
-escalonInverso=ones(10/Ts,1);
-escalonInverso(1:length(escalonInverso)/2)=escalonInverso(1:length(escalonInverso)/2);%*max(PAM);
-escalonInverso(1+length(escalonInverso)/2:length(escalonInverso))=escalonInverso(1+length(escalonInverso)/2:length(escalonInverso))*0;%*min(PAM);
-[b,a] = butter(2,0.3);
-escalonInverso = filter(b,a,escalonInverso);
-escalonInverso=[escalonInverso,zeros(length(escalonInverso),1)];
-signal_eui = escalonInverso(:,1);
+% Obtener escalon inverso unitario (1024 instacias)
+escalon_inverso_unitario = get_step(Ts, butterworth_order, cut_freq);
 
-% crear vector columna de 1024 instancias
-last_value = signal_eui(end); % ultimo valor a repetir para alcanzar las 1024 instancias necesarias para calcular la cwt
-extras_values = last_value * ones(974, 1); % se eliminaron los primeros 4 seg para que el escalon empezara desde una recta en y=1
-% Agregar el vector que contiene el ultimo valor del escalon unitario
-% inverso (repetido 974 veces) al final del vector original signal_eui.
-% los 4 seg equivalen a 20 instacias, es por ello que repite el ultima
-% valor 974 veces.
-escalon_inverso_unitario = [signal_eui; extras_values];
-
-% Crear el vector de tiempo
-t = (0:length(escalon_inverso_unitario)-1) * Ts;
-
-% Graficar el escalon unitario inverso 
-figure;
-hold on;
-plot(t, escalon_inverso_unitario, 'LineWidth', 2);
-xlabel('Tiempo (s)');
-ylabel('cm/s');
-title('Escalón Unitario Inverso: Suavizado con Filtro Butterworth 2do orden - Freq de corte de 0.3 [Hz] y periodo de muestreo de 0.2 [seg]');
-legend('Suavizado');
-ylim([-0.5, 1.1]);
-xlim([0 10]);
-grid on;
-% Ajustar los marcadores del eje x para que vayan de 0.5 en 0.5 segundos
-yticks(0:0.5:1);
-% Ajustar los marcadores del eje x para que vayan de 1 en 1 segundos
-xticks(0:1:max(t));
-
-
-% Se procede a cortar la senal de escalon inverso unitario a partir del
-% segundo 4:
-signal_escalon_unitario_inverso = escalon_inverso_unitario(21:end);
-expand_value = signal_escalon_unitario_inverso(end)*ones(20, 1);
-signal_escalon_unitario_inverso = [signal_escalon_unitario_inverso; expand_value];
-% Crear el vector de tiempo
-t = (0:length(signal_escalon_unitario_inverso)-1) * Ts;
-% Graficar el escalon unitario inverso para ver el comportamiento teorico
-figure;
-hold on;
-plot(t, signal_escalon_unitario_inverso, 'LineWidth', 2);
-xlabel('Tiempo (s)');
-ylabel('cm/s');
-title('Escalón Unitario Inverso: Suavizado con Filtro Butterworth 2do orden - Freq de corte de 0.3 [Hz] y periodo de muestreo de 0.2 [seg]');
-legend('Suavizado');
-ylim([-0.5, 1.1]);
-xlim([0 10]);
-grid on;
-% Ajustar los marcadores del eje y para que vayan de 0.5 en 0.5 segundos
-yticks(0:0.5:1);
-% Ajustar los marcadores del eje x para que vayan de 1 en 1 segundos
-xticks(0:1:max(t));
-
-
-% Aplicacion de CWT
+% Aplicacion de CWT para obtener coeficientes
 [coefs_eiu, freqs_eiu, scalscfs_eiu, psif_eiu] = cwt(escalon_inverso_unitario);
-% Especificar el directorio donde se guardara el archivo.mat de los coefs del escalon inverso unitario
+% Inicializar las estructuras
+struct_step(1) = struct('coefs_step', [], 'scalscfs_step', [], 'psif_step', [], 'freqs_step', []);
+struct_step(1).coefs_step = coefs_eiu;
+struct_step(1).freqs_step = freqs_eiu;
+struct_step(1).scalscfs_step =scalscfs_eiu;
+struct_step(1).psif_step = psif_eiu;
+% Directorio donde se guardara el archivo.mat de los coefs del escalon inverso unitario
 dir_eiu = 'D:/TT/Memoria/MemoriaCodigoFuentev3/codigo_matlab/codigo_fuente/Estructuras_SANOS_TEC/';
-% Variables para almacenar el contenido leido por medio de load() (archivo.mat asociado a los coefs predichos)
-
 % Guardar la matriz coefs_eui en un archivo .mat
 save(fullfile(dir_eiu, 'coefs_eiu.mat'), 'coefs_eiu');
+% Guardar la una estructura del escalon inverso unitario en un archivo .mat
+save(fullfile(dir_eiu, 'struct_step.mat'), 'struct_step');
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%% APLICACION DE ICWT Y OBTENCION DE LA RESPUETA DE LA VSC (DERECHA E IZQUIERDA) %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Selecionar estado (SANO/TEC), lado (VSC derecho o izquierdo) e individuo a analizar -->
+estado = 'SANOS';
+lado = 'derecho';
+persona = '1_HEMU';
+
+% Se procede a leer los coeficientes asociados a la respuesta estimada de
+% la VSC (lado: derecho o izquierdo):
+
+
+% Especificar el directorio donde esta el archivo .mat
+response_coefs_predicted_dir = strcat('D:/TT/Memoria/MemoriaCodigoFuentev3/codigo_matlab/codigo_fuente/signals_LDS/', estado, '/', persona, '/response_', lado_abrev);
+% Variables para almacenar el contenido leido por medio de load() (archivo.mat asociado a los coefs predichos)
+response_coefs_predicted_path = '';
+%response_coefs_vsc_predicted_by_unet_struct = struct();
+response_coefs_vsc_predicted_by_unet = [];
+Response_VSC = [];
+% Nombre del archivo .mat
+response_coefs_predicted_filename  = '';
+if strcmp(lado, 'derecho')
+    disp('Respuesta VSC lado derecho...');
+    response_coefs_predicted_filename = 'response_matrix_complex_vscd_predicted';
+    % Ruta completa del archivo .mat
+    response_coefs_predicted_path = fullfile(response_coefs_predicted_dir, response_coefs_predicted_filename);
+    
+    % Cargar el archivo .mat y guardar el contenido en una variable
+    response_coefs_vsc_predicted_by_unet = load(response_coefs_predicted_path);
+    % see extrae la matriz compleja
+    Response_VSC = cast(response_coefs_vsc_predicted_by_unet(1).response_matrix_complex_vscd_predicted, 'double');
+
+else%lado=izquierdo
+    disp('Respuesta VSC lado izquierdo...');
+    response_coefs_predicted_filename = 'response_matrix_complex_vsci_predicted';
+    % Ruta completa del archivo .mat
+    response_coefs_predicted_path = fullfile(response_coefs_predicted_dir, response_coefs_predicted_filename);
+    
+    % Cargar el archivo .mat y guardar el contenido en una variable
+    response_coefs_vsc_predicted_by_unet = load(response_coefs_predicted_path);
+    % see extrae la matriz compleja
+    Response_VSC = cast(response_coefs_vsc_predicted_by_unet(1).response_matrix_complex_vscd_predicted, 'double');
+end
+
+%CALCULO DE ICWT: se calcula la icwt con la respuesta de coefs predichos
+%por la red y los parametros de la VSC respectiva original (derechoo o izquierdo)
+get_signal_response_vsc = icwt(Response_VSC,[], ScalingCoefficients = scalcfs_vsc_original_signal_to_predict, AnalysisFilterBank = psif_vsc_original_signal_to_predict); % se realiza la transformada inversa continua de la senal
+get_signal_vsc_estimated_with_coefs_unet = get_signal_vsc_estimated_with_coefs_unet(:); % la reconstruccion de la senal estimada por los coeficientes predichos se pasa a formato vector columna
+error_signal_original_and_predicted = get_nmse(struct_lds_tec(pivote).signal_vscd, get_signal_vsc_estimated_with_coefs_unet); % se calcula el nmse
+
+% comparar senales
+figure;
+hold on;
+plot(get_signal_response_vsc, 'b'); % Senal original
+%plot( get_signal_vsc_estimated_with_coefs_unet, 'r--'); % Senal reconstruida por amor
+title(sprintf('%s: Señal de respuesta VSCd provocada por le escalón inverso', persona_print));
+xlabel('Tiempo(s)');
+ylabel('cm/s');
+legend('respuesta de VSC');
+hold off;

@@ -770,8 +770,8 @@ end
 
 % Selecionar estado (SANO/TEC), lado (VSC derecho o izquierdo) e individuo a analizar -->
 estado = 'SANOS';
-persona = '1_HEMU';
-lado = 'izquierdo';
+persona = '17_VATO';
+lado = 'derecho';
 lado_abrev = '';
 
 %Variables (vectores) donde se almacenaran los parametros correspondientes
@@ -790,6 +790,7 @@ for i = 1:27 % ciclo que recorre cada instancia de las estructuras (27: cantidad
             pivote = i;
             if strcmp(lado, 'derecho')
                 lado_abrev = 'VSCd';
+                disp(persona);
                 disp('GET sano-derecho');
                 coefs_vsc_original_signal_to_predict = struct_lds_sano(pivote).struct_original_VSCd.matrix_complex_original_vscd;
                 freqs_vsc_original_signal_to_predict = struct_lds_sano(pivote).struct_original_VSCd.freqs_original_vscd;
@@ -797,6 +798,7 @@ for i = 1:27 % ciclo que recorre cada instancia de las estructuras (27: cantidad
                 psif_vsc_original_signal_to_predict = struct_lds_sano(pivote).struct_original_VSCd.psif_original_vscd;
             else %lado=izquierdo
                 lado_abrev = 'VSCi';
+                disp(persona);
                 disp('GET sano-izquierdo');
                 coefs_vsc_original_signal_to_predict = struct_lds_sano(pivote).struct_original_VSCi.matrix_complex_original_vsci;
                 freqs_vsc_original_signal_to_predict = struct_lds_sano(pivote).struct_original_VSCi.freqs_original_vsci;
@@ -809,6 +811,7 @@ for i = 1:27 % ciclo que recorre cada instancia de las estructuras (27: cantidad
             pivote = i;
             if strcmp(lado, 'derecho')
                 lado_abrev = 'VSCd';
+                disp(persona);
                 disp('GET tec-derecho');
                 coefs_vsc_original_signal_to_predict = struct_lds_tec(pivote).struct_original_VSCd.matrix_complex_original_vscd;
                 freqs_vsc_original_signal_to_predict = struct_lds_tec(pivote).struct_original_VSCd.freqs_original_vscd;
@@ -816,6 +819,7 @@ for i = 1:27 % ciclo que recorre cada instancia de las estructuras (27: cantidad
                 psif_vsc_original_signal_to_predict = struct_lds_tec(pivote).struct_original_VSCd.psif_original_vscd;
             else %lado=izquierdo
                 lado_abrev = 'VSCi';
+                disp(persona);
                 disp('GET tec-izquierdo');
                 coefs_vsc_original_signal_to_predict = struct_lds_tec(pivote).struct_original_VSCi.matrix_complex_original_vsci;
                 freqs_vsc_original_signal_to_predict = struct_lds_tec(pivote).struct_original_VSCi.freqs_original_vsci;
@@ -1052,10 +1056,7 @@ save(fullfile(dir_eiu, 'struct_step.mat'), 'struct_step');
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Selecionar estado (SANO/TEC), lado (VSC derecho o izquierdo) e individuo a analizar -->
-estado = 'SANOS';
-lado = 'izquierdo';
-lado_abrev = 'VSCi';
-persona = '1_HEMU';
+
 
 % Se procede a leer los coeficientes asociados a la respuesta estimada de
 % la VSC (lado: derecho o izquierdo):
@@ -1071,7 +1072,7 @@ Response_VSC = [];
 % Nombre del archivo .mat
 response_coefs_predicted_filename  = '';
 if strcmp(lado, 'derecho')
-    disp('Respuesta VSC lado derecho...');
+    fprintf(' Obteniendo coeficientes de respuesta VSC lado derecho de sujeto %s ...\n', persona);
     response_coefs_predicted_filename = 'response_matrix_complex_vscd_predicted';
     % Ruta completa del archivo .mat
     response_coefs_predicted_path = fullfile(response_coefs_predicted_dir, response_coefs_predicted_filename);
@@ -1082,7 +1083,7 @@ if strcmp(lado, 'derecho')
     Response_VSC = cast(response_coefs_vsc_predicted_by_unet(1).response_matrix_complex_vscd_predicted, 'double');
 
 else%lado=izquierdo
-    disp('Respuesta VSC lado izquierdo...');
+    fprintf('Obteniendo coeficientes de respuesta VSC lado izquierdo de sujeto %s ...\n', persona);
     response_coefs_predicted_filename = 'response_matrix_complex_vsci_predicted';
     % Ruta completa del archivo .mat
     response_coefs_predicted_path = fullfile(response_coefs_predicted_dir, response_coefs_predicted_filename);
@@ -1112,8 +1113,10 @@ figure;
 hold on;
 plot(get_signal_response_vsc, 'b'); % Senal original
 %plot( get_signal_vsc_estimated_with_coefs_unet, 'r--'); % Senal reconstruida por amor
-title(sprintf('sujeto SANO: %s-> Señal de respuesta %s provocada por le escalón inverso', persona_print, lado_abrev));
+title(sprintf('sujeto %s: %s-> Señal de respuesta %s provocada por le escalón inverso', estado, persona_print, lado_abrev));
 xlabel('Tiempo(s)');
 ylabel('cm/s');
 legend('respuesta de VSC');
 hold off;
+
+

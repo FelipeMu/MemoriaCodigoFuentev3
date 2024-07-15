@@ -1,16 +1,16 @@
 function apply_noise_and_filter_dls(struct_dls_sano, struct_dls_tec, sampling_freq, len_signals_noises)
     
     % Carpeta donde se guardaran los nuevos archivos CSV con ruido (generar  D:\TT\Memoria\waveletycnn\codigo_matlab\codigo_fuente\signals_LDS\SANOS
-    output_folder_sanos = 'D:/TT/Memoria/waveletycnn/codigo_matlab/codigo_fuente/signals_LDS/SANOS';
-    output_folder_tec = 'D:/TT/Memoria/waveletycnn/codigo_matlab/codigo_fuente/signals_LDS/TEC';
+    output_folder_sanos = 'D:/TT/Memoria/MemoriaCodigoFuentev3/codigo_matlab/codigo_fuente/signals_LDS/SANOS';
+    output_folder_tec = 'D:/TT/Memoria/MemoriaCodigoFuentev3/codigo_matlab/codigo_fuente/signals_LDS/TEC';
 
     % Parametros de ruido gaussiano
     cv_inf = 0.05;
-    cv_sup = 0.01;
+    cv_sup = 0.1;
     % Parametros del filtro Butterworth
     order = 8;  % Octavo orden
     nyquist = sampling_freq / 2;  % Frecuencia de Nyquist
-    cutoff_freq = 0.25 * nyquist;  % Frecuencia de corte real en Hz
+    cutoff_freq = 0.25;  % Frecuencia de corte real en Hz
     [b, a] = butter(order, cutoff_freq / nyquist, 'low');  % Coeficientes del filtro
     
 

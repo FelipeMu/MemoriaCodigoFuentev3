@@ -294,22 +294,18 @@ for index = 1:numel(folder_names_sano)
     % los archivos .csv existentes en cada una de estas carpetas:
     
     % Buscar el indice del nombre de la carpeta en folder_names_signals_sano
-    indice_carpeta_pam = find(strcmp(folder_names_signals_tec, 'PAMnoises'));
+    indice_carpeta_vsci = find(strcmp(folder_names_signals_sano, 'PAMnoises'));
     % Se obtiene el directorio de la carpeta que almacena las senales PAM con
     % ruido del sujeto index:
-    path_pam_noises_tec = fullfile(file_pam_tec{1}, folder_names_signals_tec{indice_carpeta_pam}); % directorio de PAMnoises
+    path_pam_noises_tec = fullfile(file_pam_tec{1}, folder_names_signals_tec{1}); % directorio de PAMnoises
  
-    % Buscar el indice del nombre de la carpeta en folder_names_signals_sano
-    indice_carpeta_vscd = find(strcmp(folder_names_signals_tec, 'VSCdnoises'));
     % Se obtiene el directorio de la carpeta que almacena las senales VSCd con
     % ruido:
-    path_vscd_noises_tec = fullfile(file_pam_tec{1}, folder_names_signals_tec{indice_carpeta_vscd}); % directorio de VSCdnoises
+    path_vscd_noises_tec = fullfile(file_pam_tec{1}, folder_names_signals_tec{2}); % directorio de VSCdnoises
  
-    % Buscar el indice del nombre de la carpeta en folder_names_signals_sano
-    indice_carpeta_vsci = find(strcmp(folder_names_signals_tec, 'VSCinoises'));
     % Se obtiene el directorio de la carpeta que almacena las senales VSCd con
     % ruido:
-    path_vsci_noises_tec = fullfile(file_pam_tec{1}, folder_names_signals_tec{indice_carpeta_vsci}); % directorio de VSCinoises
+    path_vsci_noises_tec = fullfile(file_pam_tec{1}, folder_names_signals_tec{3}); % directorio de VSCinoises
 
 
     %=========================================================================================================================
@@ -344,9 +340,7 @@ for index = 1:numel(folder_names_sano)
     vsci_noises_csvi_tec = dir(fullfile(path_vsci_noises_tec, '*.csv'));
     %=========================================================================================================================
 
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    %%%%%%%%%%%%%%% RELLENADO DE ESTRUCTURAS SANOS Y TEC CON DATOS DE PAM, VSCd Y VSCi CON RUIDO %%%%%%%%%%%%%%%%%%%%%%%
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
     fprintf("[%i] Pareo sano y tec:\n", index);
     fprintf("%s <-> %s\n",file_person_sano{1}, file_person_tec{1});
     for j = 1:num_csv
@@ -455,9 +449,9 @@ for index = 1:numel(folder_names_sano)
         struct_lds_tec(index).struct_VSCi_noises(j).vsci_noise = data_vsci_noises_tec; % Guardar la senal VSCi con ruido
 
 
-        %##############################################################################################
-        %######## APLICACION DE CWT Y GUARDADO DE PARAMETROS EN ESTRUCTURA DE SANOS Y TEC #############
-        %##############################################################################################
+        %########################################
+        %######## Aplicacion de CWT #############
+        %########################################
     
         % WAVELET MADRE CONTINUA A UTILIZAR: Analytic Morlet (Gabor)
         % Wavelet:amor

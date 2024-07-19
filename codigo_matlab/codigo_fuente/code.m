@@ -783,10 +783,10 @@ end
 
 % Selecionar estado (SANO/TEC), lado (VSC derecho o izquierdo) e individuo a analizar -->
 estado = 'SANOS';
-persona = '17_VATO';
+persona = '11_JULE';
 lado = 'derecho';
 lado_abrev = '';
-
+num_people = 27;
 %Variables (vectores) donde se almacenaran los parametros correspondientes
 %al estado, persona y lado del individuo a analizar:
 coefs_vsc_original_signal_to_predict = [];
@@ -797,7 +797,7 @@ psif_vsc_original_signal_to_predict = [];
 pivote = 0; % indice de la estructura donde se alamcena el individuo que se desea analizar:
 % Ciclo que hace get de los parametros necesarios para luego aplicar la
 % ICWT.
-for i = 1:27 % ciclo que recorre cada instancia de las estructuras (27: cantidad de individuos)
+for i = 1:num_people % ciclo que recorre cada instancia de las estructuras (27: cantidad de individuos)
     if strcmp(estado, 'SANOS')
         if strcmp(struct_lds_sano(i).name_file, persona) 
             pivote = i;
@@ -871,7 +871,6 @@ foldernames_tecs = setdiff(foldernames_tecs, {'.', '..'}); % vector fila que alm
 %################################################
 % Guardar las matrices complejas en archivos .mat
 %################################################
-num_people = 27;
 for i = 1:num_people
     % Se deben crear 3 carpetas para cada sujeto sano y paciente TEC. una
     % carpeta de matriz_compleja_pam, matriz_compleja_vscd y
@@ -932,24 +931,24 @@ coefs_vsc_predicted_by_unet = [];
 % Nombre del archivo .mat
 coefs_predicted_filename  = '';
 if strcmp(lado, 'derecho')
-    coefs_predicted_filename = 'matrix_complex_vscd_predicted';
+    coefs_predicted_filename = 'coefs_matrix_complex_vscd_predicted';
     % Ruta completa del archivo .mat
     coefs_predicted_path = fullfile(coefs_predicted_dir, coefs_predicted_filename);
     
     % Cargar el archivo .mat y guardar el contenido en una variable
     coefs_vsc_predicted_by_unet_struct = load(coefs_predicted_path);
     % see extrae la matriz compleja
-    coefs_vsc_predicted_by_unet = cast(coefs_vsc_predicted_by_unet_struct(1).matrix_complex_vscd_predicted, 'double');
+    coefs_vsc_predicted_by_unet = cast(coefs_vsc_predicted_by_unet_struct(1).coefs_matrix_complex_vscd_predicted, 'double');
 
 else%lado=izquierdo
-    coefs_predicted_filename = 'matrix_complex_vsci_predicted';
+    coefs_predicted_filename = 'coefs_matrix_complex_vsci_predicted';
     % Ruta completa del archivo .mat
     coefs_predicted_path = fullfile(coefs_predicted_dir, coefs_predicted_filename);
     
     % Cargar el archivo .mat y guardar el contenido en una variable
     coefs_vsc_predicted_by_unet_struct = load(coefs_predicted_path);
     % see extrae la matriz compleja
-    coefs_vsc_predicted_by_unet = cast(coefs_vsc_predicted_by_unet_struct(1).matrix_complex_vsci_predicted, 'double');
+    coefs_vsc_predicted_by_unet = cast(coefs_vsc_predicted_by_unet_struct(1).coefs_matrix_complex_vsci_predicted, 'double');
 end
 
 

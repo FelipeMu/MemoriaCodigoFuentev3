@@ -58,7 +58,7 @@ function escalon_inverso_unitario = get_step(Ts, order, cut_freq)
     % Ajustar los marcadores del eje y para que vayan de 0.5 en 0.5 segundos
     yticks(0:0.5:1);
     % Ajustar los marcadores del eje x para que vayan de 1 en 1 segundos
-    xticks(0:5:max(t));
+    xticks(0:1:max(t));
 
 
 

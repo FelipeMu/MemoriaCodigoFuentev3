@@ -684,7 +684,6 @@ for i = 1:num_people
     end
 
 
-
     %%%% TEC %%%%
     if ~exist(direct_final_cfs_pam_tec, 'dir')
         mkdir(direct_final_cfs_pam_tec);
@@ -1033,9 +1032,11 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Se procede a guardar los coefs en formato.mat para probarlo en la red
-% Este input de coefs de escalon unitario inverso es de uso general, es
-% decir, se utiliza para todos los modelos, tanto de sujetos SANOS como
-% pacientes TEC.
+% Este input de coefs de escalon unitario inverso es de uso particular, es
+% decir, cada sujeto SANO y paciente TEC tiene un escalón inverso que esta
+% escalado de acuerdo al max(PAM) y min(PAM). Esto sucede ya que la red
+% no fue entrenada con datos normalizados, ya que el error NMSE aumentaba 
+% con respecto a la salida de la red (coeficientes//respuesta VSC)
 
 % CODIGO RAIZ - creacion de escalon inverso unitario:
 % periodo de muestreo=0.2 [seg]
@@ -1048,29 +1049,58 @@ cut_freq = 0.3;
 %escalon_inverso_unitario = get_step(Ts, butterworth_order, cut_freq);
 
 
+num_people = 27;
+% CREACION DE ESTRUCTURA QUE GUARDARA INFORMACION DE LOS ESCALONES DE CADA
+% INDIVIDUO. struct_steps_sanos{struct_step, struct_step, ...} y
+% struct_steps_tecs{struct_step, struct_step, ...}
+struct_step_sanos(num_people) = struct('nombre', '','coefs_step', [], 'scalscfs_step', [], 'psif_step', [], 'freqs_step', []);%SANOS
+struct_step_tecs(num_people) = struct('nombre', '','coefs_step', [], 'scalscfs_step', [], 'psif_step', [], 'freqs_step', []);%TECS
+
+
+
+%bucle para recorrer todos los sujetos SANOS y luego pacientes TEC:
+for i = 1:num_people
+    
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %%%%%%%%%%%%% SANO %%%%%%%%%%%%%%%%%
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    persona_sana = struct_lds_sano(i); % se asigna un persona de acuerdo al indice en la estructura de sanos
+    pam_persona_sana = persona.signal_pam; %se selecciona la senal PAM de la persona i
+    %CALCULO Y OBTENCION DE LA SENAL DEL ESCALON INVERSO
+    escalon_inverso_unitario_persona_sana = get_step_no_normalized(Ts, butterworth_order, cut_freq, pam_persona_sana);
+    %CALCULO DE LA CWT() PARA OBTENER LOS COEFICIENTES (INPUT DE LA RED)
+    [coefs_eiu, freqs_eiu, scalscfs_eiu, psif_eiu] = cwt(escalon_inverso_unitario_persona_sana);
+    %ASIGNAR INFORMACION DE LA PERSONA SANA A SU RESPECTIVA ESTRUCTURA
+    struct_step_sanos(i).nombre = persona.name_file;
+    struct_step_sanos(i).coefs_step = coefs_eiu;
+    struct_step_sanos(i).freqs_step = freqs_eiu;
+    struct_step_sanos(i).scalscfs_step =scalscfs_eiu;
+    struct_step_sanos(i).psif_step = psif_eiu;
+    %SE CREA CARPETA QUE GUARDARA EL ESCALON DE LA PERSONA SANA:
+    dir_step_sano = strcat('D:/TT/Memoria/MemoriaCodigoFuentev3/codigo_matlab/codigo_fuente/signals_LDS/SANOS/', persona.name_file, '/step');
+    %%%% SANO %%%%
+    if ~exist(dir_step_sano, 'dir')
+        mkdir(dir_step_sano);
+    end
+    %SE GUARDAN LOS COEFICIENTES EN FORMATO .mat
+    save(fullfile(dir_eiu, 'coefs_step.mat'), 'coefs_step');
+
+
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %%%%%%%%%%%%%%% TEC %%%%%%%%%%%%%%%%
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+end
 
 
 
 
 
-%persona a analizar:
-persona = struct_lds_sano(2); %Se elige 11_JULE ya que su respuesta de vSC derecha no es buena
-pam_persona = persona.signal_pam; %se selecciona la senal PAM de la persona
 
-escalon_inverso_unitario = get_step_no_normalized(Ts, butterworth_order, cut_freq, pam_persona);
 
-% Aplicacion de CWT para obtener coeficientes
-[coefs_eiu, freqs_eiu, scalscfs_eiu, psif_eiu] = cwt(escalon_inverso_unitario);
-% Inicializar las estructuras
-struct_step(1) = struct('coefs_step', [], 'scalscfs_step', [], 'psif_step', [], 'freqs_step', []);
-struct_step(1).coefs_step = coefs_eiu;
-struct_step(1).freqs_step = freqs_eiu;
-struct_step(1).scalscfs_step =scalscfs_eiu;
-struct_step(1).psif_step = psif_eiu;
-% Directorio donde se guardara el archivo.mat de los coefs del escalon inverso unitario
-dir_eiu = 'D:/TT/Memoria/MemoriaCodigoFuentev3/codigo_matlab/codigo_fuente/Estructuras_SANOS_TEC/';
-% Guardar la matriz coefs_eui en un archivo .mat
-save(fullfile(dir_eiu, 'coefs_eiu_minmaxpam.mat'), 'coefs_eiu');
+
+
+
 % Guardar la una estructura del escalon inverso unitario en un archivo .mat
-save(fullfile(dir_eiu, 'struct_step_minxmaxpam.mat'), 'struct_step');
+%save(fullfile(dir_eiu, 'struct_step_minxmaxpam.mat'), 'struct_step');
 

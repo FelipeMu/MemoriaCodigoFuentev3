@@ -34,21 +34,20 @@ function signal_escalon_unitario_inverso_final = get_step_no_normalized(Ts, orde
 
     % Crear el vector de tiempo
     t = (0:length(signal_escalon_unitario_inverso_final)-1) * Ts;
+    
+    
     % Graficar el escalon unitario inverso para ver el comportamiento teorico
-    figure;
-    hold on;
-    plot(t, signal_escalon_unitario_inverso_final, 'LineWidth', 2);
-    xlabel('Tiempo (s)');
-    ylabel('cm/s');
-    title('Escalón Unitario Inverso: Suavizado con Filtro Butterworth 2do orden - Freq de corte de 0.3 [Hz] y periodo de muestreo de 0.2 [seg]');
-    legend('Suavizado');
-    %ylim([-0.5, 1.1]);
-    xlim([0 45]);
-    grid on;
-    % Ajustar los marcadores del eje y para que vayan de 0.5 en 0.5 segundos
-    %yticks(0:0.5:1);
+    %figure;
+    %hold on;
+    %plot(t, signal_escalon_unitario_inverso_final, 'LineWidth', 2);
+    %xlabel('Tiempo (s)');
+    %ylabel('cm/s');
+    %title('Escalón Unitario Inverso: Suavizado con Filtro Butterworth 2do orden - Freq de corte de 0.3 [Hz] y periodo de muestreo de 0.2 [seg]');
+    %legend('Suavizado');
+    %xlim([0 45]);
+    %grid on;
     % Ajustar los marcadores del eje x para que vayan de 1 en 1 segundos
-    xticks(0:1:max(t));
+    %xticks(0:1:max(t));
 
 
 

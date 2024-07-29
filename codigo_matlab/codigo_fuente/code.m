@@ -1045,9 +1045,8 @@ end
 Ts=0.2;
 butterworth_order = 2;
 cut_freq = 0.3;
-% Obtener escalon inverso unitario (1024 instacias)=3.2min
+% Obtener escalon inverso unitario (1024 instacias) ~3.4min
 %escalon_inverso_unitario = get_step(Ts, butterworth_order, cut_freq);
-
 
 num_people = 27;
 % CREACION DE ESTRUCTURA QUE GUARDARA INFORMACION DE LOS ESCALONES DE CADA
@@ -1056,51 +1055,67 @@ num_people = 27;
 struct_step_sanos(num_people) = struct('nombre', '','coefs_step', [], 'scalscfs_step', [], 'psif_step', [], 'freqs_step', []);%SANOS
 struct_step_tecs(num_people) = struct('nombre', '','coefs_step', [], 'scalscfs_step', [], 'psif_step', [], 'freqs_step', []);%TECS
 
-
-
 %bucle para recorrer todos los sujetos SANOS y luego pacientes TEC:
-for i = 1:num_people
-    
+for i = 1:num_people    
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %%%%%%%%%%%%% SANO %%%%%%%%%%%%%%%%%
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     persona_sana = struct_lds_sano(i); % se asigna un persona de acuerdo al indice en la estructura de sanos
-    pam_persona_sana = persona.signal_pam; %se selecciona la senal PAM de la persona i
+    fprintf('(%i) Creando coeficientes de escalon inverso para sano: %s\n', i, persona_sana.name_file);
+    pam_persona_sana = persona_sana.signal_pam; %se selecciona la senal PAM de la persona i
     %CALCULO Y OBTENCION DE LA SENAL DEL ESCALON INVERSO
     escalon_inverso_unitario_persona_sana = get_step_no_normalized(Ts, butterworth_order, cut_freq, pam_persona_sana);
     %CALCULO DE LA CWT() PARA OBTENER LOS COEFICIENTES (INPUT DE LA RED)
-    [coefs_eiu, freqs_eiu, scalscfs_eiu, psif_eiu] = cwt(escalon_inverso_unitario_persona_sana);
+    [coefs_step, freqs_step, scalscfs_step, psif_step] = cwt(escalon_inverso_unitario_persona_sana);
     %ASIGNAR INFORMACION DE LA PERSONA SANA A SU RESPECTIVA ESTRUCTURA
-    struct_step_sanos(i).nombre = persona.name_file;
-    struct_step_sanos(i).coefs_step = coefs_eiu;
-    struct_step_sanos(i).freqs_step = freqs_eiu;
-    struct_step_sanos(i).scalscfs_step =scalscfs_eiu;
-    struct_step_sanos(i).psif_step = psif_eiu;
+    struct_step_sanos(i).nombre = persona_sana.name_file;
+    struct_step_sanos(i).coefs_step = coefs_step;
+    struct_step_sanos(i).freqs_step = freqs_step;
+    struct_step_sanos(i).scalscfs_step = scalscfs_step;
+    struct_step_sanos(i).psif_step = psif_step;
     %SE CREA CARPETA QUE GUARDARA EL ESCALON DE LA PERSONA SANA:
-    dir_step_sano = strcat('D:/TT/Memoria/MemoriaCodigoFuentev3/codigo_matlab/codigo_fuente/signals_LDS/SANOS/', persona.name_file, '/step');
+    dir_step_sano = strcat('D:/TT/Memoria/MemoriaCodigoFuentev3/codigo_matlab/codigo_fuente/signals_LDS/SANOS/', persona_sana.name_file, '/step');
     %%%% SANO %%%%
     if ~exist(dir_step_sano, 'dir')
         mkdir(dir_step_sano);
     end
     %SE GUARDAN LOS COEFICIENTES EN FORMATO .mat
-    save(fullfile(dir_eiu, 'coefs_step.mat'), 'coefs_step');
-
+    save(fullfile(dir_step_sano, 'coefs_step.mat'), 'coefs_step');
 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %%%%%%%%%%%%%%% TEC %%%%%%%%%%%%%%%%
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    persona_tec = struct_lds_tec(i); % se asigna un persona de acuerdo al indice en la estructura de sanos
+    pam_persona_tec = persona_tec.signal_pam; %se selecciona la senal PAM de la persona i
+    fprintf('(%i) Creando coeficientes de escalon inverso para tec: %s\n', i, persona_tec.name_file);
+    %CALCULO Y OBTENCION DE LA SENAL DEL ESCALON INVERSO
+    escalon_inverso_unitario_persona_tec = get_step_no_normalized(Ts, butterworth_order, cut_freq, pam_persona_tec);
+    %CALCULO DE LA CWT() PARA OBTENER LOS COEFICIENTES (INPUT DE LA RED)
+    [coefs_step, freqs_step, scalscfs_step, psif_step] = cwt(escalon_inverso_unitario_persona_tec);
+    %ASIGNAR INFORMACION DE LA PERSONA SANA A SU RESPECTIVA ESTRUCTURA
+    struct_step_tecs(i).nombre = persona_tec.name_file;
+    struct_step_tecs(i).coefs_step = coefs_step;
+    struct_step_tecs(i).freqs_step = freqs_step;
+    struct_step_tecs(i).scalscfs_step = scalscfs_step;
+    struct_step_tecs(i).psif_step = psif_step;
+    %SE CREA CARPETA QUE GUARDARA EL ESCALON DE LA PERSONA SANA:
+    dir_step_tec = strcat('D:/TT/Memoria/MemoriaCodigoFuentev3/codigo_matlab/codigo_fuente/signals_LDS/TEC/', persona_tec.name_file, '/step');
+    %%%% SANO %%%%
+    if ~exist(dir_step_tec, 'dir')
+        mkdir(dir_step_tec);
+    end
+    %SE GUARDAN LOS COEFICIENTES EN FORMATO .mat
+    save(fullfile(dir_step_tec, 'coefs_step.mat'), 'coefs_step');
 
 end
 
+% SE GUARDA ESTRUCTURA ASOCIADA A LOS SANOS EN FORMATO .mat
+dir_structs_sano = strcat('D:/TT/Memoria/MemoriaCodigoFuentev3/codigo_matlab/codigo_fuente/Estructuras_SANOS_TEC/');
+% Guardar la una estructuras generales del escalon inverso unitario de cada sujeto SANO en un archivo .mat
+save(fullfile(dir_structs_sano, 'struct_step_sanos.mat'), 'struct_step_sanos');
 
-
-
-
-
-
-
-
-
-% Guardar la una estructura del escalon inverso unitario en un archivo .mat
-%save(fullfile(dir_eiu, 'struct_step_minxmaxpam.mat'), 'struct_step');
+% SE GUARDA ESTRUCTURA ASOCIADA A LOS TECs EN FORMATO .mat
+dir_structs_tec = strcat('D:/TT/Memoria/MemoriaCodigoFuentev3/codigo_matlab/codigo_fuente/Estructuras_SANOS_TEC/');
+% Guardar la una estructuras generales del escalon inverso unitario de cada paciente TEC en un archivo .mat
+save(fullfile(dir_structs_tec, 'struct_step_tecs.mat'), 'struct_step_tecs');
 

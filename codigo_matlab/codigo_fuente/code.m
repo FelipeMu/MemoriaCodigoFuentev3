@@ -1031,6 +1031,7 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+
 % Se procede a guardar los coefs en formato.mat para probarlo en la red
 % Este input de coefs de escalon unitario inverso es de uso particular, es
 % decir, cada sujeto SANO y paciente TEC tiene un escalón inverso que esta
@@ -1047,6 +1048,31 @@ butterworth_order = 2;
 cut_freq = 0.3;
 % Obtener escalon inverso unitario (1024 instacias) ~3.4min
 %escalon_inverso_unitario = get_step(Ts, butterworth_order, cut_freq);
+
+
+%%%______ evaluando solo al sujeto 11_JULE (grafica de respuesta de VSCd)
+persona = struct_lds_sano(2); %Se elige 11_JULE ya que su respuesta de vSC derecha no es buena
+pam_persona = persona.signal_pam; %se selecciona la senal PAM de la persona
+disp(persona);
+[escalon_inverso_unitario, largo_escalon_ini] = get_step_no_normalized_testing(Ts, butterworth_order, cut_freq, pam_persona);
+disp(length(largo_escalon_ini));
+disp(length(escalon_inverso_unitario));
+
+
+struct_minmaxpam(1) = struct('coefs_step', [], 'freqs_step', [], 'scalscfs_step', [], 'psif_step', []);
+% Aplicacion de CWT para obtener coeficientes
+[coefs_step, freqs_step, scalscfs_step, psif_step] = cwt(escalon_inverso_unitario);
+struct_minmaxpam(1).coefs_step = coefs_step;
+struct_minmaxpam(1).freqs_step = freqs_step;
+struct_minmaxpam(1).scalscfs_step = scalscfs_step;
+struct_minmaxpam(1).psif_step = psif_step;
+
+% Directorio donde se guardara el archivo.mat de los coefs del escalon inverso unitario
+dir_eiu = 'D:/TT/Memoria/MemoriaCodigoFuentev3/codigo_matlab/codigo_fuente/Estructuras_SANOS_TEC/';
+% Guardar la matriz coefs_eui en un archivo .mat
+save(fullfile(dir_eiu, 'coefs_step.mat'), 'coefs_step');
+save(fullfile(dir_eiu, 'struct_minmaxpam.mat'), 'struct_minmaxpam');
+%%%______
 
 num_people = 27;
 % CREACION DE ESTRUCTURA QUE GUARDARA INFORMACION DE LOS ESCALONES DE CADA

@@ -1090,7 +1090,7 @@ for i = 1:num_people
     fprintf('(%i) Creando coeficientes de escalon inverso para sano: %s\n', i, persona_sana.name_file);
     pam_persona_sana = persona_sana.signal_pam; %se selecciona la senal PAM de la persona i
     %CALCULO Y OBTENCION DE LA SENAL DEL ESCALON INVERSO
-    escalon_inverso_unitario_persona_sana = get_step_no_normalized(Ts, butterworth_order, cut_freq, pam_persona_sana);
+    escalon_inverso_unitario_persona_sana = get_step_no_normalized_testing(Ts, butterworth_order, cut_freq, pam_persona_sana);
     %CALCULO DE LA CWT() PARA OBTENER LOS COEFICIENTES (INPUT DE LA RED)
     [coefs_step, freqs_step, scalscfs_step, psif_step] = cwt(escalon_inverso_unitario_persona_sana);
     %ASIGNAR INFORMACION DE LA PERSONA SANA A SU RESPECTIVA ESTRUCTURA
@@ -1100,7 +1100,7 @@ for i = 1:num_people
     struct_step_sanos(i).scalscfs_step = scalscfs_step;
     struct_step_sanos(i).psif_step = psif_step;
     %SE CREA CARPETA QUE GUARDARA EL ESCALON DE LA PERSONA SANA:
-    dir_step_sano = strcat('D:/TT/Memoria/MemoriaCodigoFuentev3/codigo_matlab/codigo_fuente/signals_LDS/SANOS/', persona_sana.name_file, '/step');
+    dir_step_sano = strcat('D:/TT/Memoria/MemoriaCodigoFuentev3/codigo_matlab/codigo_fuente/signals_LDS_steps/SANOS/', persona_sana.name_file, '/step');
     %%%% SANO %%%%
     if ~exist(dir_step_sano, 'dir')
         mkdir(dir_step_sano);
@@ -1115,7 +1115,7 @@ for i = 1:num_people
     pam_persona_tec = persona_tec.signal_pam; %se selecciona la senal PAM de la persona i
     fprintf('(%i) Creando coeficientes de escalon inverso para tec: %s\n', i, persona_tec.name_file);
     %CALCULO Y OBTENCION DE LA SENAL DEL ESCALON INVERSO
-    escalon_inverso_unitario_persona_tec = get_step_no_normalized(Ts, butterworth_order, cut_freq, pam_persona_tec);
+    escalon_inverso_unitario_persona_tec = get_step_no_normalized_testing(Ts, butterworth_order, cut_freq, pam_persona_tec);
     %CALCULO DE LA CWT() PARA OBTENER LOS COEFICIENTES (INPUT DE LA RED)
     [coefs_step, freqs_step, scalscfs_step, psif_step] = cwt(escalon_inverso_unitario_persona_tec);
     %ASIGNAR INFORMACION DE LA PERSONA SANA A SU RESPECTIVA ESTRUCTURA
@@ -1125,14 +1125,13 @@ for i = 1:num_people
     struct_step_tecs(i).scalscfs_step = scalscfs_step;
     struct_step_tecs(i).psif_step = psif_step;
     %SE CREA CARPETA QUE GUARDARA EL ESCALON DE LA PERSONA SANA:
-    dir_step_tec = strcat('D:/TT/Memoria/MemoriaCodigoFuentev3/codigo_matlab/codigo_fuente/signals_LDS/TEC/', persona_tec.name_file, '/step');
+    dir_step_tec = strcat('D:/TT/Memoria/MemoriaCodigoFuentev3/codigo_matlab/codigo_fuente/signals_LDS_steps/TEC/', persona_tec.name_file, '/step');
     %%%% SANO %%%%
     if ~exist(dir_step_tec, 'dir')
         mkdir(dir_step_tec);
     end
     %SE GUARDAN LOS COEFICIENTES EN FORMATO .mat
     save(fullfile(dir_step_tec, 'coefs_step.mat'), 'coefs_step');
-
 end
 
 % SE GUARDA ESTRUCTURA ASOCIADA A LOS SANOS EN FORMATO .mat

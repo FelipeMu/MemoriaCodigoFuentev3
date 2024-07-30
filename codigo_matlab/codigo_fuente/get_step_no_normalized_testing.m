@@ -20,6 +20,7 @@ function [signal_escalon_unitario_inverso_final, signal_eui] = get_step_no_norma
     fprintf('despues de agrgear valores extras: %i\n', length(escalon_inverso_unitario));
     %escalon_inverso_unitario = escalon_inverso_unitario(50:end);
     
+    %{
     % Crear el vector de tiempo
     t = (0:length(escalon_inverso_unitario)-1) * Ts;
     % Graficar el escalon unitario inverso para ver el comportamiento teorico
@@ -34,6 +35,7 @@ function [signal_escalon_unitario_inverso_final, signal_eui] = get_step_no_norma
     grid on;
     % Ajustar los marcadores del eje x para que vayan de 1 en 1 segundos
     xticks(0:5:max(t));
+    %}
 
 
 
@@ -48,7 +50,7 @@ function [signal_escalon_unitario_inverso_final, signal_eui] = get_step_no_norma
     %expand_value = signal_escalon_unitario_inverso_final(end)*ones(44, 1);
     %signal_escalon_unitario_inverso_final = [signal_escalon_unitario_inverso_final; expand_value];
     
-
+    %{
     % Crear el vector de tiempo
     t = (0:length(signal_escalon_unitario_inverso_final)-1) * Ts;
     
@@ -65,7 +67,6 @@ function [signal_escalon_unitario_inverso_final, signal_eui] = get_step_no_norma
     grid on;
     % Ajustar los marcadores del eje x para que vayan de 1 en 1 segundos
     xticks(0:5:max(t));
-
-
+    %}
 
 end

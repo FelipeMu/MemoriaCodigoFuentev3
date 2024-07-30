@@ -1032,24 +1032,7 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-% Se procede a guardar los coefs en formato.mat para probarlo en la red
-% Este input de coefs de escalon unitario inverso es de uso particular, es
-% decir, cada sujeto SANO y paciente TEC tiene un escalón inverso que esta
-% escalado de acuerdo al max(PAM) y min(PAM). Esto sucede ya que la red
-% no fue entrenada con datos normalizados, ya que el error NMSE aumentaba 
-% con respecto a la salida de la red (coeficientes//respuesta VSC)
-
-% CODIGO RAIZ - creacion de escalon inverso unitario:
-% periodo de muestreo=0.2 [seg]
-% filtro butterworth de 2do orden
-% frecuencia de corte = 0.3 [Hz]
-Ts=0.2;
-butterworth_order = 2;
-cut_freq = 0.3;
-% Obtener escalon inverso unitario (1024 instacias) ~3.4min
-%escalon_inverso_unitario = get_step(Ts, butterworth_order, cut_freq);
-
-
+%{
 %%%______ evaluando solo al sujeto 11_JULE (grafica de respuesta de VSCd)
 persona = struct_lds_sano(2); %Se elige 11_JULE ya que su respuesta de vSC derecha no es buena
 pam_persona = persona.signal_pam; %se selecciona la senal PAM de la persona
@@ -1073,13 +1056,32 @@ dir_eiu = 'D:/TT/Memoria/MemoriaCodigoFuentev3/codigo_matlab/codigo_fuente/Estru
 save(fullfile(dir_eiu, 'coefs_step.mat'), 'coefs_step');
 save(fullfile(dir_eiu, 'struct_minmaxpam.mat'), 'struct_minmaxpam');
 %%%______
+%}
 
+
+
+
+% Se procede a guardar los coefs en formato.mat para probarlo en la red
+% Este input de coefs de escalon unitario inverso es de uso particular, es
+% decir, cada sujeto SANO y paciente TEC tiene un escalón inverso que esta
+% escalado de acuerdo al max(PAM) y min(PAM). Esto sucede ya que la red
+% no fue entrenada con datos normalizados, ya que el error NMSE aumentaba 
+% con respecto a la salida de la red (coeficientes//respuesta VSC)
+
+% CODIGO RAIZ - creacion de escalon inverso unitario:
+% periodo de muestreo=0.2 [seg]
+% filtro butterworth de 2do orden
+% frecuencia de corte = 0.3 [Hz]
+Ts=0.2;
+butterworth_order = 2;
+cut_freq = 0.3;
+% Obtener escalon inverso unitario (1024 instacias) ~3.4min
 num_people = 27;
 % CREACION DE ESTRUCTURA QUE GUARDARA INFORMACION DE LOS ESCALONES DE CADA
 % INDIVIDUO. struct_steps_sanos{struct_step, struct_step, ...} y
 % struct_steps_tecs{struct_step, struct_step, ...}
-struct_step_sanos(num_people) = struct('nombre', '','coefs_step', [], 'scalscfs_step', [], 'psif_step', [], 'freqs_step', []);%SANOS
-struct_step_tecs(num_people) = struct('nombre', '','coefs_step', [], 'scalscfs_step', [], 'psif_step', [], 'freqs_step', []);%TECS
+struct_step_sanos(num_people) = struct('nombre', '','coefs_step', [], 'scalscfs_step', [], 'psif_step', [], 'freqs_step', [], 'signal_step', []);%SANOS
+struct_step_tecs(num_people) = struct('nombre', '','coefs_step', [], 'scalscfs_step', [], 'psif_step', [], 'freqs_step', [], 'signal_step', []);%TECS
 
 %bucle para recorrer todos los sujetos SANOS y luego pacientes TEC:
 for i = 1:num_people    
@@ -1099,6 +1101,8 @@ for i = 1:num_people
     struct_step_sanos(i).freqs_step = freqs_step;
     struct_step_sanos(i).scalscfs_step = scalscfs_step;
     struct_step_sanos(i).psif_step = psif_step;
+    struct_step_sanos(i).signal_step = escalon_inverso_unitario_persona_sana;
+    
     %SE CREA CARPETA QUE GUARDARA EL ESCALON DE LA PERSONA SANA:
     dir_step_sano = strcat('D:/TT/Memoria/MemoriaCodigoFuentev3/codigo_matlab/codigo_fuente/signals_LDS_steps/SANOS/', persona_sana.name_file, '/step');
     %%%% SANO %%%%
@@ -1107,7 +1111,7 @@ for i = 1:num_people
     end
     %SE GUARDAN LOS COEFICIENTES EN FORMATO .mat
     save(fullfile(dir_step_sano, 'coefs_step.mat'), 'coefs_step');
-
+    
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %%%%%%%%%%%%%%% TEC %%%%%%%%%%%%%%%%
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1124,6 +1128,8 @@ for i = 1:num_people
     struct_step_tecs(i).freqs_step = freqs_step;
     struct_step_tecs(i).scalscfs_step = scalscfs_step;
     struct_step_tecs(i).psif_step = psif_step;
+    struct_step_tecs(i).signal_step = escalon_inverso_unitario_persona_tec;
+    
     %SE CREA CARPETA QUE GUARDARA EL ESCALON DE LA PERSONA SANA:
     dir_step_tec = strcat('D:/TT/Memoria/MemoriaCodigoFuentev3/codigo_matlab/codigo_fuente/signals_LDS_steps/TEC/', persona_tec.name_file, '/step');
     %%%% SANO %%%%
@@ -1132,6 +1138,7 @@ for i = 1:num_people
     end
     %SE GUARDAN LOS COEFICIENTES EN FORMATO .mat
     save(fullfile(dir_step_tec, 'coefs_step.mat'), 'coefs_step');
+    
 end
 
 % SE GUARDA ESTRUCTURA ASOCIADA A LOS SANOS EN FORMATO .mat

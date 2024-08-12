@@ -892,7 +892,7 @@ for i = 1:num_people
     direct_final_CoefficientsPredicted_VSCi_sano = fullfile(direct_folder_sano_i, name_folder_CoefficientsPredicted_VSCi);
 
     % Directorio donde se crearan dichas carpetas (2 total:
-    % name_folder_CoefficientsPredicted_VSCd y name_folderCoefficientsPredicted_VSCi)
+    % name_folder_CoefficientsPredicted_VSCd y name_folder_CoefficientsPredicted_VSCi)
     % *** TEC ***
     direct_final_CoefficientsPredicted_VSCd_tec = fullfile(direct_folder_tec_i, name_folder_CoefficientsPredicted_VSCd);
     direct_final_CoefficientsPredicted_VSCi_tec = fullfile(direct_folder_tec_i, name_folder_CoefficientsPredicted_VSCi);
@@ -918,7 +918,7 @@ end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%% COPIAR CARPETA "PAMorigimal_matrixcomplex" DESDE DIRECOTRIO BASE A DIRECTORIO CON LOS INPUTS PARA LA RED PARA %%% 
+%%%%%%%%%%%%%% COPIADO DE CARPETAS A NUEVOS DIRECTORIOS DESDE DIRECOTRIO BASE A DIRECTORIO CON LOS INPUTS PARA LA RED PARA %%%%% 
 %%%%%%%%%%%%%% PREDECIR LA SEÑAL VSC                                                                                         %%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1043,6 +1043,48 @@ for i = 1:num_people
         warning('La carpeta de origen %s no existe.', source_folder_tec_vsci_tensor3d);
     end
 end
+
+
+
+%PARA COPIAR LA CARPETA DE PAM-ORIGINAL-MATRIXCOMPLEX
+% Copiar las carpetas asociadas a los inputs y outputs para el
+% el entrenamiento de la red (carpetas tensores 3d)
+for i = 1:num_people
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %PAM
+    % Directorios de destino
+    dest_folder_sano_coefs_pred_vscd = fullfile(direct_sanos, foldernames_sanos{i}, 'CoefficientsPredicted_VSCd');
+    dest_folder_sano_coefs_pred_vsci = fullfile(direct_sanos, foldernames_sanos{i}, 'CoefficientsPredicted_VSCi');
+
+    dest_folder_tec_coefs_pred_vscd = fullfile(direct_tecs, foldernames_tecs{i}, 'CoefficientsPredicted_VSCd');
+    dest_folder_tec_coefs_pred_vsci = fullfile(direct_tecs, foldernames_tecs{i}, 'CoefficientsPredicted_VSCi');
+    % Se crean directorios si no existen:
+    %SANO
+    if ~exist(dest_folder_sano_coefs_pred_vscd, 'dir')
+        mkdir(dest_folder_sano_coefs_pred_vscd);
+    end
+    if ~exist(dest_folder_sano_coefs_pred_vsci, 'dir')
+        mkdir(dest_folder_sano_coefs_pred_vsci);
+    end
+    %TEC
+    if ~exist(dest_folder_tec_coefs_pred_vscd, 'dir')
+        mkdir(dest_folder_tec_coefs_pred_vscd);
+    end
+    if ~exist(dest_folder_tec_coefs_pred_vsci, 'dir')
+        mkdir(dest_folder_tec_coefs_pred_vsci);
+    end
+end
+
+
+
+
+
+
+
+
+
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

@@ -1,4 +1,4 @@
-function apply_noise_and_filter_dls(struct_dls_sano, struct_dls_tec, sampling_freq, len_signals_noises)
+function apply_noise_and_filter_lds(struct_dls_sano, struct_dls_tec, sampling_freq, len_signals_noises)
     
     % Carpeta donde se guardaran los nuevos archivos CSV con ruido (generar  D:\TT\Memoria\waveletycnn\codigo_matlab\codigo_fuente\signals_LDS\SANOS
     output_folder_sanos = 'D:/TT/Memoria/MemoriaCodigoFuentev3/codigo_matlab/codigo_fuente/signals_LDS/SANOS';

@@ -52,8 +52,8 @@ structure_original_PAM(1) = struct('matrix_complex_original_pam', [], 'scalscfs_
 structure_original_VSCd(1) = struct('matrix_complex_original_vscd', [], 'scalscfs_original_vscd', [], 'psif_original_vscd', [], 'freqs_original_vscd', []);
 structure_original_VSCi(1) = struct('matrix_complex_original_vsci', [], 'scalscfs_original_vsci', [], 'psif_original_vsci', [], 'freqs_original_vsci', []);
 
-structure_vscd_noises_sano(num_of_noises_signals) = struct('name_file_noise', '', 'pam_noise', [], 'matrix_complex_pam', [], 'scalscfs_pam_noise', [], 'psif_pam_noise', [], 'freqs_pam_noise', [], 'vscd_noise', [], 'matrix_complex_vscd', [], 'scalscfs_vscd_noise', [], 'psif_vscd_noise', [], 'freqs_vscd_noise', []);
-structure_vsci_noises_sano(num_of_noises_signals) = struct('name_file_noise', '', 'pam_noise', [], 'matrix_complex_pam', [], 'scalscfs_pam_noise', [], 'psif_pam_noise', [], 'freqs_pam_noise', [], 'vsci_noise', [], 'matrix_complex_vsci', [], 'scalscfs_vsci_noise', [], 'psif_vsci_noise', [], 'freqs_vsci_noise', []);
+structure_vscd_noises_sano(1:num_of_noises_signals) = struct('name_file_noise', '', 'pam_noise', [], 'matrix_complex_pam', [], 'scalscfs_pam_noise', [], 'psif_pam_noise', [], 'freqs_pam_noise', [], 'vscd_noise', [], 'matrix_complex_vscd', [], 'scalscfs_vscd_noise', [], 'psif_vscd_noise', [], 'freqs_vscd_noise', []);
+structure_vsci_noises_sano(1:num_of_noises_signals) = struct('name_file_noise', '', 'pam_noise', [], 'matrix_complex_pam', [], 'scalscfs_pam_noise', [], 'psif_pam_noise', [], 'freqs_pam_noise', [], 'vsci_noise', [], 'matrix_complex_vsci', [], 'scalscfs_vsci_noise', [], 'psif_vsci_noise', [], 'freqs_vsci_noise', []);
 struct_lds_sano(num_healthy_people) = struct('name_file', '', 'signal_pam', [], 'signal_vscd', [], 'signal_vsci', [], 'struct_VSCd_noises', structure_vscd_noises_sano, 'struct_VSCi_noises', structure_vsci_noises_sano, 'struct_original_PAM', [], 'struct_original_VSCd', [], 'struct_original_VSCi', []);
 
 temp = 0; % activador para considerar que la senal PAM es la columna 2 (solo para el sujeto 27_HC036101.PAR)
@@ -923,11 +923,11 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-direct_sanos_to_copy = 'D:/TT/Memoria/MemoriaCodigoFuentev3/codigo_matlab/codigo_fuente/signals_LDS/SANOS';
-direct_tecs_to_copy = 'D:/TT/Memoria/MemoriaCodigoFuentev3/codigo_matlab/codigo_fuente/signals_LDS/TEC';
+direct_sanos_to_copy = 'D:/TT/Memoria/MemoriaCodigoFuentev3/codigo_matlab/codigo_fuente/signals_LDS_training/SANOS';
+direct_tecs_to_copy = 'D:/TT/Memoria/MemoriaCodigoFuentev3/codigo_matlab/codigo_fuente/signals_LDS_training/TEC';
 
-direct_sanos = 'D:/TT/Memoria/MemoriaCodigoFuentev3/codigo_matlab/codigo_fuente/signals_LDS_training/SANOS';
-direct_tecs = 'D:/TT/Memoria/MemoriaCodigoFuentev3/codigo_matlab/codigo_fuente/signals_LDS_training/TEC';
+direct_sanos = 'D:/TT/Memoria/MemoriaCodigoFuentev3/codigo_matlab/codigo_fuente/signals_LDS_IOpredictions/SANOS';
+direct_tecs = 'D:/TT/Memoria/MemoriaCodigoFuentev3/codigo_matlab/codigo_fuente/signals_LDS_IOpredictions/TEC';
 
 % Obtener los nombres de las carpetas dentro del directorio de SANOS
 folders_sanos = dir(direct_sanos_to_copy);
@@ -951,12 +951,68 @@ for i = 1:num_people
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %PAM
     % Directorios de origen
-    source_folder_sano_pam_tensor3d = fullfile(direct_sanos_to_copy, foldernames_sanos{i}, 'PAMnoises_matrixcomplex_npy_tensor3d');
-    source_folder_tec_pam_tensor3d = fullfile(direct_tecs_to_copy, foldernames_tecs{i}, 'PAMnoises_matrixcomplex_npy_tensor3d');
-    % Directorios de destino
-    dest_folder_sano_pam_tensor3d = fullfile(direct_sanos, foldernames_sanos{i}, 'PAMnoises_matrixcomplex_npy_tensor3d');
-    dest_folder_tec_pam_tensor3d = fullfile(direct_tecs, foldernames_tecs{i}, 'PAMnoises_matrixcomplex_npy_tensor3d');
-    % Se crean directorios si no existen:
+    %source_folder_sano_pam_tensor3d = fullfile(direct_sanos_to_copy, foldernames_sanos{i}, 'PAMnoises_matrixcomplex_npy_tensor3d');
+    %source_folder_tec_pam_tensor3d = fullfile(direct_tecs_to_copy, foldernames_tecs{i}, 'PAMnoises_matrixcomplex_npy_tensor3d');
+    %dest_folder_sano_pam_tensor3d = fullfile(direct_sanos, foldernames_sanos{i}, 'PAMnoises_matrixcomplex_npy_tensor3d');
+    %dest_folder_tec_pam_tensor3d = fullfile(direct_tecs, foldernames_tecs{i}, 'PAMnoises_matrixcomplex_npy_tensor3d');
+
+
+    %DIRECTORIOS ORIGEN
+    % OBTENCION DE LAS CARPETAS SOLICITADAS DE LOS SUJETOS SANOS
+    source_folder_sano_CoefsPredVSCd = fullfile(direct_sanos_to_copy, foldernames_sanos{i}, 'CoefficientsPredicted_VSCd');
+    source_folder_sano_CoefsPredVSCi = fullfile(direct_sanos_to_copy, foldernames_sanos{i}, 'CoefficientsPredicted_VSCi');
+    source_folder_sano_PAMoriginal = fullfile(direct_sanos_to_copy, foldernames_sanos{i}, 'PAMoriginal_matrixcomplex');
+    source_folder_sano_Step = fullfile(direct_sanos_to_copy, foldernames_sanos{i}, 'step');
+    % OBTENCION DE LAS CARPETAS SOLICITADAS DE LOS PACIENTES TEC
+    source_folder_tec_CoefsPredVSCd = fullfile(direct_tecs_to_copy, foldernames_tecs{i}, 'CoefficientsPredicted_VSCd');
+    source_folder_tec_CoefsPredVSCi = fullfile(direct_tecs_to_copy, foldernames_tecs{i}, 'CoefficientsPredicted_VSCi');
+    source_folder_tec_PAMoriginal = fullfile(direct_tecs_to_copy, foldernames_tecs{i}, 'PAMoriginal_matrixcomplex');
+    source_folder_tec_Step = fullfile(direct_tecs_to_copy, foldernames_tecs{i}, 'step');
+
+
+    % DIRECTORIOS DESTINO
+    % OBTENCION DE LAS CARPETAS SOLICITADAS DE LOS SUJETOS SANOS
+    dest_folder_sano_CoefsPredVSCd = fullfile(direct_sanos, foldernames_sanos{i}, 'CoefficientsPredicted_VSCd');
+    dest_folder_sano_CoefsPredVSCi = fullfile(direct_sanos, foldernames_sanos{i}, 'CoefficientsPredicted_VSCi');
+    dest_folder_sano_PAMoriginal = fullfile(direct_sanos, foldernames_sanos{i}, 'PAMoriginal_matrixcomplex');
+    dest_folder_sano_Step = fullfile(direct_sanos, foldernames_sanos{i}, 'step');
+    % OBTENCION DE LAS CARPETAS SOLICITADAS DE LOS PACIENTES TEC
+    dest_folder_tec_CoefsPredVSCd = fullfile(direct_tecs, foldernames_tecs{i}, 'CoefficientsPredicted_VSCd');
+    dest_folder_tec_CoefsPredVSCi = fullfile(direct_tecs, foldernames_tecs{i}, 'CoefficientsPredicted_VSCi');
+    dest_folder_tec_PAMoriginal = fullfile(direct_tecs, foldernames_tecs{i}, 'PAMoriginal_matrixcomplex');
+    dest_folder_tec_Step = fullfile(direct_tecs, foldernames_tecs{i}, 'step');
+    
+   
+    
+    % CREACION DE CARPETAS DESTINO SI NO EXISTEN:
+    % PARA SANOS:
+    if ~exist(dest_folder_sano_CoefsPredVSCd, 'dir')
+        mkdir(dest_folder_sano_CoefsPredVSCd);
+    end
+    if ~exist(dest_folder_sano_CoefsPredVSCi, 'dir')
+        mkdir(dest_folder_sano_CoefsPredVSCi);
+    end
+    if ~exist(dest_folder_sano_PAMoriginal, 'dir')
+        mkdir(dest_folder_sano_PAMoriginal);
+    end
+    if ~exist(dest_folder_sano_Step, 'dir')
+        mkdir(dest_folder_sano_Step);
+    end
+
+    % PARA TECS:
+    if ~exist(dest_folder_tec_CoefsPredVSCd, 'dir')
+        mkdir(dest_folder_tec_CoefsPredVSCd);
+    end
+    if ~exist(dest_folder_tec_CoefsPredVSCi, 'dir')
+        mkdir(dest_folder_tec_CoefsPredVSCi);
+    end
+    if ~exist(dest_folder_tec_PAMoriginal, 'dir')
+        mkdir(dest_folder_tec_PAMoriginal);
+    end
+    if ~exist(dest_folder_tec_Step, 'dir')
+        mkdir(dest_folder_tec_Step);
+    end
+    %{
     %SANO
     if ~exist(dest_folder_sano_pam_tensor3d, 'dir')
         mkdir(dest_folder_sano_pam_tensor3d);
@@ -965,7 +1021,57 @@ for i = 1:num_people
     if ~exist(dest_folder_tec_pam_tensor3d, 'dir')
         mkdir(dest_folder_tec_pam_tensor3d);
     end
- 
+    %}
+    
+
+    % COPIADO DE CARPETAS EN LOS DIRECTORIOS DESTINO:
+    % PARA SANOS:
+    if exist(source_folder_sano_CoefsPredVSCd, 'dir')
+        copyfile(source_folder_sano_CoefsPredVSCd, dest_folder_sano_CoefsPredVSCd);
+    else
+        warning('La carpeta de origen %s no existe.', source_folder_sano_CoefsPredVSCd);
+    end
+    if exist(source_folder_sano_CoefsPredVSCi, 'dir')
+        copyfile(source_folder_sano_CoefsPredVSCi, dest_folder_sano_CoefsPredVSCi);
+    else
+        warning('La carpeta de origen %s no existe.', source_folder_sano_CoefsPredVSCi);
+    end
+    if exist(source_folder_sano_PAMoriginal, 'dir')
+        copyfile(source_folder_sano_PAMoriginal, dest_folder_sano_PAMoriginal);
+    else
+        warning('La carpeta de origen %s no existe.', source_folder_sano_PAMoriginal);
+    end
+    if exist(source_folder_sano_Step, 'dir')
+        copyfile(source_folder_sano_Step, dest_folder_sano_Step);
+    else
+        warning('La carpeta de origen %s no existe.', source_folder_sano_Step);
+    end
+
+    % PARA TECS:
+    if exist(source_folder_tec_CoefsPredVSCd, 'dir')
+        copyfile(source_folder_tec_CoefsPredVSCd, dest_folder_tec_CoefsPredVSCd);
+    else
+        warning('La carpeta de origen %s no existe.', source_folder_tec_CoefsPredVSCd);
+    end
+    if exist(source_folder_tec_CoefsPredVSCi, 'dir')
+        copyfile(source_folder_tec_CoefsPredVSCi, dest_folder_tec_CoefsPredVSCi);
+    else
+        warning('La carpeta de origen %s no existe.', source_folder_tec_CoefsPredVSCi);
+    end
+    if exist(source_folder_tec_PAMoriginal, 'dir')
+        copyfile(source_folder_tec_PAMoriginal, dest_folder_tec_PAMoriginal);
+    else
+        warning('La carpeta de origen %s no existe.', source_folder_tec_PAMoriginal);
+    end
+    if exist(source_folder_tec_Step, 'dir')
+        copyfile(source_folder_tec_Step, dest_folder_tec_Step);
+    else
+        warning('La carpeta de origen %s no existe.', source_folder_tec_Step);
+    end
+
+
+
+    %{
     % Copiar la carpeta "PAMnoises_matrixcomplex_npy_tensor3d" para SANOS
     if exist(source_folder_sano_pam_tensor3d, 'dir')
         copyfile(source_folder_sano_pam_tensor3d, dest_folder_sano_pam_tensor3d);
@@ -1042,6 +1148,7 @@ for i = 1:num_people
     else
         warning('La carpeta de origen %s no existe.', source_folder_tec_vsci_tensor3d);
     end
+    %}
 end
 
 
@@ -1280,7 +1387,7 @@ for i = 1:num_people
     struct_step_sanos(i).signal_step = escalon_inverso_unitario_persona_sana;
     
     %SE CREA CARPETA QUE GUARDARA EL ESCALON DE LA PERSONA SANA:
-    dir_step_sano = strcat('D:/TT/Memoria/MemoriaCodigoFuentev3/codigo_matlab/codigo_fuente/signals_LDS_steps/SANOS/', persona_sana.name_file, '/step');
+    dir_step_sano = strcat('D:/TT/Memoria/MemoriaCodigoFuentev3/codigo_matlab/codigo_fuente/signals_LDS_training/SANOS/', persona_sana.name_file, '/step');
     %%%% SANO %%%%
     if ~exist(dir_step_sano, 'dir')
         mkdir(dir_step_sano);
@@ -1291,14 +1398,14 @@ for i = 1:num_people
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %%%%%%%%%%%%%%% TEC %%%%%%%%%%%%%%%%
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    persona_tec = struct_lds_tec(i); % se asigna un persona de acuerdo al indice en la estructura de sanos
+    persona_tec = struct_lds_tec(i); % se asigna un persona de acuerdo al indice en la estructura de tecs
     pam_persona_tec = persona_tec.signal_pam; %se selecciona la senal PAM de la persona i
     fprintf('(%i) Creando coeficientes de escalon inverso para tec: %s\n', i, persona_tec.name_file);
     %CALCULO Y OBTENCION DE LA SENAL DEL ESCALON INVERSO
     escalon_inverso_unitario_persona_tec = get_step_no_normalized_testing(Ts, butterworth_order, cut_freq, pam_persona_tec);
     %CALCULO DE LA CWT() PARA OBTENER LOS COEFICIENTES (INPUT DE LA RED)
     [coefs_step, freqs_step, scalscfs_step, psif_step] = cwt(escalon_inverso_unitario_persona_tec);
-    %ASIGNAR INFORMACION DE LA PERSONA SANA A SU RESPECTIVA ESTRUCTURA
+    %ASIGNAR INFORMACION DE LA PERSONA TEC A SU RESPECTIVA ESTRUCTURA
     struct_step_tecs(i).nombre = persona_tec.name_file;
     struct_step_tecs(i).coefs_step = coefs_step;
     struct_step_tecs(i).freqs_step = freqs_step;
@@ -1306,9 +1413,9 @@ for i = 1:num_people
     struct_step_tecs(i).psif_step = psif_step;
     struct_step_tecs(i).signal_step = escalon_inverso_unitario_persona_tec;
     
-    %SE CREA CARPETA QUE GUARDARA EL ESCALON DE LA PERSONA SANA:
-    dir_step_tec = strcat('D:/TT/Memoria/MemoriaCodigoFuentev3/codigo_matlab/codigo_fuente/signals_LDS_steps/TEC/', persona_tec.name_file, '/step');
-    %%%% SANO %%%%
+    %SE CREA CARPETA QUE GUARDARA EL ESCALON DE LA PERSONA TEC:
+    dir_step_tec = strcat('D:/TT/Memoria/MemoriaCodigoFuentev3/codigo_matlab/codigo_fuente/signals_LDS_training/TEC/', persona_tec.name_file, '/step');
+    %%%% TEC %%%%
     if ~exist(dir_step_tec, 'dir')
         mkdir(dir_step_tec);
     end
@@ -1316,6 +1423,12 @@ for i = 1:num_people
     save(fullfile(dir_step_tec, 'coefs_step.mat'), 'coefs_step');
     
 end
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%% GUARDADO DE ESTRUCTURAS DE STEP DE SANOS Y TECS %%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % SE GUARDA ESTRUCTURA ASOCIADA A LOS SANOS EN FORMATO .mat
 dir_structs_sano = strcat('D:/TT/Memoria/MemoriaCodigoFuentev3/codigo_matlab/codigo_fuente/Estructuras_SANOS_TEC/');

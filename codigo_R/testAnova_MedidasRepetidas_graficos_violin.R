@@ -57,16 +57,24 @@ grid.arrange(grafico_mfARI, ncol = 1)
 #### TEST ANOVA #######################################
 #######################################################
 
-# ANOVA
-resultado_anova <- aov(mfARI ~ Nombre, data = datos_totales)
+# Convertir a factores si no lo son
+datos_totales$Nombre <- factor(datos_totales$Nombre)
+datos_totales$Tipo <- factor(datos_totales$Tipo)
+
+
+resultado_anova <- aov(mfARI ~ Nombre + Tipo, data = datos_totales)
+
+# Muestra el resumen del ANOVA
 print(summary(resultado_anova))
 
-# Test de Tukey
-tukey <- TukeyHSD(resultado_anova)
-print(tukey)
+# Comparaciones post hoc
+emmeans_result <- emmeans(resultado_anova, ~ Nombre)
+pairs(emmeans_result)
+ 
 
-#GRAFICOS VIOLIN IDENTIFICANDO GRUPOS QUE PRESENTAN DIFERENCIAS SIGNIFICATIVAS
-ggplot(datos_totales, aes(x = Nombre, y = mfARI, fill = Nombre)) +
+
+# Gráfico de violín con comparación de grupos y significancia
+grafico_mfARI_significancia <- ggplot(datos_totales, aes(x = Nombre, y = mfARI, fill = Nombre)) +
   geom_violin(trim = FALSE) +
   geom_jitter(width = 0.2, alpha = 0.5) +
   theme_minimal() +
@@ -82,5 +90,9 @@ ggplot(datos_totales, aes(x = Nombre, y = mfARI, fill = Nombre)) +
   map_signif_level = TRUE, 
   y_position = c(15, 16, 17, 18), # Ajusta las posiciones según sea necesario
   textsize = 3)
+
+print(grafico_mfARI_significancia)
+
+
 
 

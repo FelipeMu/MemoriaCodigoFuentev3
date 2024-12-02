@@ -18,7 +18,7 @@ library(afex)
 # *************************************************************************************
 
 # Directorio donde se encuentran los archivos CSV
-directorio_csv <- "D:/TT/Memoria/MemoriaCodigoFuentev3/codigo_R/TESTINGv11_baseline40to90_InitialSignal8seg_minVSC8.2-14_AC_Indexs_Norm_NNM2d5OI_FD_LR0d001_E300_DO0d2"
+directorio_csv <- "D:/TT/Memoria/MemoriaCodigoFuentev3/codigo_R/TESTINGv12_baseline40to90_InitialSignal8seg_minVSC8.2-14_AC_Indexs_Norm_NNM2d5OI_FD_LR0d001_E300_WithoutDO0d2"
 
 # Leer los archivos CSV y agregar columnas para el tipo y el nombre
 IndexAC_SANO_DERECHO <- read.csv(file.path(directorio_csv, "IndexAC_SANO_DERECHO.csv")) %>%
@@ -310,9 +310,9 @@ shapiro_test <- shapiro.test(residuos)
 print(shapiro_test)
 qqnorm(residuos)
 qqline(residuos)
-# conclusion: Se acepta la hipotesis nula H0. (p=0.4108)
+# conclusion: Se acepta la hipotesis nula H0. (p=0.1305)
 
-# 2. Verificar esfericidad (p=0.039594 --> correccion Greenhouse.Geisser y Huyinh-Feldt --> p=7.017e-07)
+# 2. Verificar esfericidad (p=0.04763 --> correccion Greenhouse.Geisser y Huyinh-Feldt --> p=3.462e-0.5)
 # Comparaciones multiples (POST-HOC)
 datos_pareados_tabla_larga <- gather(data = datos_pareados, key = "Grupo", value = "mfARI", 2:5)
 posthoc <- pairwise.t.test(x = datos_pareados_tabla_larga$mfARI, g = datos_pareados_tabla_larga$Grupo,

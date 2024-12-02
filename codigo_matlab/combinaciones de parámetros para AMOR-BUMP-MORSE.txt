@@ -1,0 +1,48 @@
+min_error_amor_bump(sgl, w) =AMOR
+error mínimo:
+   3.1885e-31
+
+VoicesPerOctave:
+     3
+
+min_error_morse(sgl)=MORSE
+error mínimo:
+   2.8435e-31
+
+VoicesPerOctave:
+     2
+
+TimeBandwidth:
+    28
+
+
+min_error_amor_bump(sgl, w)=BUMP
+error mínimo:
+   3.3122e-31
+
+VoicesPerOctave:
+     4
+
+_________________________
+_________________________
+TEC:
+
+
+min_error_amor_bump(sgl, w)=AMOR
+error mínimo:
+   5.7375e-31
+
+VoicesPerOctave:
+    11
+
+
+
+min_error_amor_bump(sgl, w)=BUMP
+error mínimo:
+   5.9066e-31
+
+VoicesPerOctave:
+     6
+
+
+
